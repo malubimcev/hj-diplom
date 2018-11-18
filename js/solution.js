@@ -20,6 +20,7 @@ class Menu {
     this.drag = container.querySelector('.drag');
     this.draggedMenu = null;
     this.menuWidth = this.menu.offsetWidth;
+    this.showComments = container.querySelector('input[name="toggle"]');
 
     this.onMove = throttle(event => {
       if (this.draggedMenu) {
@@ -47,8 +48,9 @@ class Menu {
     this.menu.addEventListener('click', this.setState.bind(this));
     this.drag.addEventListener('mousedown', (event) => this.draggedMenu = this.menu);
     document.addEventListener('mousemove', this.onMove.bind(this));
+    this.showComments.addEventListener('input', this.changeCommentMode.bind(this));
 
-    this.drag.addEventListener('mouseup', (event) => {
+    document.addEventListener('mouseup', (event) => {
       if (this.draggedMenu) {
         this.draggedMenu = null;
       }
@@ -58,6 +60,10 @@ class Menu {
 
   getMenuItem(event) {
     return event.target.classList.contains('menu__item') ? event.target : event.target.parentElement;
+  }
+  
+  changeCommentMode() {
+    console.log('mode=' + this.menu.querySelector('input[name="toggle"]'));
   }
 
   setState(event) {
@@ -73,6 +79,12 @@ class Menu {
     }
 
     app.resetModes();
+    
+    if (item.classList.contains('tool')) {
+      if (item.dataset.state === 'selected') {
+        console.log(event.target);
+      }
+    }    
 
     if (item.classList.contains('burger')) {
       resetState();
@@ -82,6 +94,13 @@ class Menu {
     if (item.classList.contains('new')) {
       if (item.dataset.state === 'selected') {
         app.selectFile();
+      }
+    }
+    
+    if (item.classList.contains('comments')) {
+      if (item.dataset.state === 'selected') {
+        app.setCommentMode();
+        
       }
     }
 
@@ -102,7 +121,9 @@ class Application {
     this.menu = new Menu(container.querySelector('.menu'));
     this.imageLoader = container.querySelector('.image-loader');
     this.currentImage = container.querySelector('.current-image');
-
+    this.imageId = '';
+    this.commentsForm = container.querySelector('.comments__form');
+    
     this.error = container.querySelector('.error');
     this.errorMessage = container.querySelector('.error__message');
     this.fileTypeErrorMessage = 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.';
@@ -125,15 +146,20 @@ class Application {
   }
 
   setShareMode() {
-
+    
+    //
   }
 
   setCommentMode() {
-
+    const markers = this.commentsForm.querySelectorAll('.comments__marker');
+    for (const marker of markers) {
+      // if this.menu
+    }
+    //
   }
 
   setDrawMode() {
-
+    //
   }
 
   setErrorMode(errMessage) {
@@ -156,10 +182,15 @@ class Application {
     formData.append('image', file);
     const loader = new FileLoader();
     loader.update(formData, '/pic', (data) => {
-      console.log(data);
+      this.currentImage.src = data.url;
+      this.imageId = data.id;
       this.setShareMode();
     });
     //
+  }
+
+  getPicId() {
+    return this.imageId;
   }
 
 }
@@ -173,21 +204,6 @@ class FileLoader {
 
   registerEvents() {
     //
-  }
-
-  upload(data, url, callback) {
-    fetch(this.mainURL + url, {
-      body: data,
-      method: 'POST'
-    })
-      .then(res => {
-        if (200 <= res.status && res.status < 300) {
-          return res.json();
-        }
-        throw new Error(res.statusText);
-      })
-      .then(callback)
-      .catch(err => app.setErrorMode(err.message));      //
   }
 
   update(data, url, callback) {
@@ -231,11 +247,34 @@ class Comment {
 
 class CommentBoard {
   constructor(container) {
+    this.board = container;
+    this.addButton = this.board.querySelector('.comments__submit');
+    this.closeButton = this.board.querySelector('.comments__close');
+    this.commentInput = this.board.querySelector('.comments__input');
 
     this.registerEvents();
   }
 
   registerEvents() {
+    this.addButton.addEventListener('click', this.close.bind(this));
+    this.submitButton.addEventListener('click', this.sendComment.bind(this));
+  }
+
+  sendComment() {
+    let formData = new FormData(this.board);
+    formData.append('left', this.board.style.left);
+    formData.append('top', this.board.style.top);
+    formData.append('message', this.commentInput.textContent);
+    const loader = new FileLoader();
+    const url = '/pic/' + app.getPicId() + '/comments'
+    loader.update(formData, url, (data) => {
+      this.currentImage.src = data.url;
+      this.imageId = data.id;
+      this.setShareMode();
+    });
+  }
+
+  close() {
     //
   }
 
