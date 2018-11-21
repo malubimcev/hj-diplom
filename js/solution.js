@@ -21,6 +21,8 @@ class Menu {
     this.draggedMenu = null;
     this.menuWidth = this.menu.offsetWidth;
     this.showComments = container.querySelector('input[name="toggle"]');
+    this.linkField = container.querySelector('.menu__url');
+    this.copyLinkBtn = container.querySelector('.menu_copy');
 
     this.onMove = throttle(event => {
       if (this.draggedMenu) {
@@ -45,10 +47,11 @@ class Menu {
   }
 
   registerEvents() {
-    this.menu.addEventListener('click', this.setState.bind(this));
-    this.drag.addEventListener('mousedown', (event) => this.draggedMenu = this.menu);
+    this.menu.addEventListener('click', this.setState.bind(this), false);
+    this.drag.addEventListener('mousedown', (event) => this.draggedMenu = this.menu, false);
     document.addEventListener('mousemove', this.onMove.bind(this));
-    this.showComments.addEventListener('input', this.changeCommentMode.bind(this));
+    this.showComments.addEventListener('input', this.changeCommentMode.bind(this), false);
+    this.copyLinkBtn.addEventListener('click', this.copyLink.bind(this), false);
 
     document.addEventListener('mouseup', (event) => {
       if (this.draggedMenu) {
@@ -114,6 +117,12 @@ class Menu {
     this.menuWidth = this.menu.offsetWidth;
   }
 
+  copyLink() {
+    navigator.clipboard.writeText(this.linkField.value)
+      .then(() => console.log(this.linkField.value + ' скопирована'))
+      .catch(err => console.log('Ошибка копирования в буфер', err));
+  }
+
 }
 
 class Application {
@@ -122,6 +131,7 @@ class Application {
     this.imageLoader = container.querySelector('.image-loader');
     this.currentImage = container.querySelector('.current-image');
     this.imageId = '';
+    this.page = {};
     this.commentsForm = container.querySelector('.comments__form');
     
     this.error = container.querySelector('.error');
@@ -145,8 +155,8 @@ class Application {
     this.imageLoader.style = 'display: none;';
   }
 
-  setShareMode() {
-    
+  setShareMode(link = '') {
+    this.menu.linkField.value = link;
     //
   }
 
@@ -184,13 +194,19 @@ class Application {
     loader.update(formData, '/pic', (data) => {
       this.currentImage.src = data.url;
       this.imageId = data.id;
+
       this.setShareMode();
     });
-    //
   }
 
   getPicId() {
     return this.imageId;
+  }
+
+  getLink(id) {
+    const loader = new FileLoader();
+    loader.loadData('/pic/' + this.imageId)
+      .then(data => this.page = data);
   }
 
 }
@@ -222,13 +238,14 @@ class FileLoader {
   }
 
   loadData(url) {
-    return fetch(url)
+    return fetch(this.mainURL + url)
       .then(res => {
         if (200 <= res.status && res.status < 300) {
           return res.json();
         }
         throw new Error(res.statusText);
       })
+      .catch(err => app.setErrorMode(err.message));
   }
 
 }
