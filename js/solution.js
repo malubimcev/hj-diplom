@@ -20,7 +20,7 @@ class Menu {
     this.drag = container.querySelector('.drag');
     this.draggedMenu = null;
     this.menuWidth = this.menu.offsetWidth;
-    this.showComments = container.querySelector('input[name="toggle"]');
+    this.showComments = container.querySelectorAll('input[name="toggle"]');
     this.linkField = container.querySelector('.menu__url');
     this.copyLinkBtn = container.querySelector('.menu_copy');
 
@@ -50,7 +50,7 @@ class Menu {
     this.menu.addEventListener('click', this.setState.bind(this), false);
     this.drag.addEventListener('mousedown', (event) => this.draggedMenu = this.menu, false);
     document.addEventListener('mousemove', this.onMove.bind(this));
-    this.showComments.addEventListener('input', this.changeCommentMode.bind(this), false);
+    Array.from(this.showComments).forEach(item => item.addEventListener('change', this.changeCommentMode.bind(this), false));
     this.copyLinkBtn.addEventListener('click', this.copyLink.bind(this), false);
 
     document.addEventListener('mouseup', (event) => {
@@ -66,7 +66,8 @@ class Menu {
   }
   
   changeCommentMode() {
-    console.log('mode=' + this.menu.querySelector('input[name="toggle"]'));
+    const mode = this.menu.querySelector('.menu__toggle-bg input:checked').value;
+    app.setCommentMode(mode);
   }
 
   setState(event) {
@@ -84,9 +85,9 @@ class Menu {
     app.resetModes();
     
     if (item.classList.contains('tool')) {
-      if (item.dataset.state === 'selected') {
-        console.log(event.target);
-      }
+      //if (item.dataset.state === 'selected') {
+        //console.log(event.target);
+      //}
     }    
 
     if (item.classList.contains('burger')) {
@@ -102,7 +103,7 @@ class Menu {
     
     if (item.classList.contains('comments')) {
       if (item.dataset.state === 'selected') {
-        app.setCommentMode();
+        this.changeCommentMode();
         
       }
     }
@@ -119,7 +120,7 @@ class Menu {
 
   copyLink() {
     navigator.clipboard.writeText(this.linkField.value)
-      .then(() => console.log(this.linkField.value + ' скопирована'))
+      .then()
       .catch(err => console.log('Ошибка копирования в буфер', err));
   }
 
@@ -127,11 +128,12 @@ class Menu {
 
 class Application {
   constructor(container) {
+    this.container = container;
     this.menu = new Menu(container.querySelector('.menu'));
     this.imageLoader = container.querySelector('.image-loader');
     this.currentImage = container.querySelector('.current-image');
     this.imageId = '';
-    this.page = {};
+    this.page = 'https://netology-code.github.io/hj-26-malubimcev/';
     this.commentsForm = container.querySelector('.comments__form');
     
     this.error = container.querySelector('.error');
@@ -140,6 +142,8 @@ class Application {
     this.fileLoadErrorMessage = 'Чтобы загрузить новое изображение, пожалуйста, воспользуйтесь пунктом "Загрузить новое" в меню.';
 
     this.registerEvents();
+    this.setCommentMode('on');
+    this.setPublicationMode();
   }
 
   registerEvents() {
@@ -155,17 +159,17 @@ class Application {
     this.imageLoader.style = 'display: none;';
   }
 
-  setShareMode(link = '') {
-    this.menu.linkField.value = link;
-    //
+  setShareMode() {
+    const id = this.imageId ? ('?id=' + this.imageId) : '';
+    this.menu.linkField.value = this.page + id;
   }
 
-  setCommentMode() {
-    const markers = this.commentsForm.querySelectorAll('.comments__marker');
+  setCommentMode(mode) {
+    const display = mode === 'on' ? 'display: block;' : 'display: none;';
+    const markers = this.container.querySelectorAll('.comments__form');
     for (const marker of markers) {
-      // if this.menu
+      marker.style = display;
     }
-    //
   }
 
   setDrawMode() {
@@ -194,7 +198,6 @@ class Application {
     loader.update(formData, '/pic', (data) => {
       this.currentImage.src = data.url;
       this.imageId = data.id;
-
       this.setShareMode();
     });
   }
