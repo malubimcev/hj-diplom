@@ -47,7 +47,7 @@ class Menu {
   }
 
   registerEvents() {
-    this.menu.addEventListener('click', this.setState.bind(this), false);
+    this.menu.addEventListener('click', (event) => this.setState(this.getMenuItem(event)).bind(this), false);
     this.drag.addEventListener('mousedown', (event) => this.draggedMenu = this.menu, false);
     document.addEventListener('mousemove', this.onMove.bind(this));
     Array.from(this.showComments).forEach(item => item.addEventListener('change', this.changeCommentMode.bind(this), false));
@@ -70,9 +70,7 @@ class Menu {
     app.setCommentMode(mode);
   }
 
-  setState(event) {
-    const item = this.getMenuItem(event);
-
+  setState(item) {
     const resetState = () => {
       const modeItems = this.menu.querySelectorAll('.mode');
       for (const modeItem of modeItems) {
@@ -112,7 +110,11 @@ class Menu {
       resetState();
       this.menu.dataset.state = 'selected';
       item.dataset.state = 'selected';
-      app.setShareMode();
+      if (item.classList.contains('draw')) {
+        app.setDrawMode();
+      } else {
+        app.setShareMode();
+      }
     }
 
     this.menuWidth = this.menu.offsetWidth;
@@ -144,6 +146,7 @@ class Application {
     this.registerEvents();
     this.setCommentMode('on');
     this.setPublicationMode();
+    //this.setDrawMode();
   }
 
   registerEvents() {
@@ -157,9 +160,11 @@ class Application {
 
   setPublicationMode() {
     this.imageLoader.style = 'display: none;';
+    this.menu
   }
 
   setShareMode() {
+    this.currentImage.removeEventListener('click', (event) => console.log(event.clientX + '=' +  event.clientY));
     const id = this.imageId ? ('?id=' + this.imageId) : '';
     this.menu.linkField.value = this.page + id;
   }
@@ -170,10 +175,14 @@ class Application {
     for (const marker of markers) {
       marker.style = display;
     }
+    this.currentImage.addEventListener('click', (event) => console.log('comment'));
   }
 
   setDrawMode() {
-    //
+    // this.currentImage.addEventListener('mousedown', (event) => console.log(event.clientX + '=down=' +  event.clientY));
+    // this.currentImage.addEventListener('mouseup', (event) => console.log(event.clientX + '=up=' +  event.clientY));
+    // this.currentImage.addEventListener('mousemove', (event) => console.log(event.clientX + '=move=' +  event.clientY));
+    // this.currentImage.addEventListener('mouseout', (event) => console.log(event.clientX + '=out=' +  event.clientY));
   }
 
   setErrorMode(errMessage) {
@@ -254,15 +263,20 @@ class FileLoader {
 }
 
 class Comment {
-  constructor(container) {
-
-    this.registerEvents();
+  constructor(commentInfo) {
+    const time = document.createElement('p');
+    time.classList.add('comment__time');
+    time.textContent = commentInfo.timestamp;
+    const message = document.createElement('p');
+    message.classList.add('comment__message');
+    message.textContent = commentInfo.message;
+    this.comment = document.createElement('div');
+    this.comment.classList.add('comment');
+    this.comment.appendChild(time);
+    this.comment.appendChild(message);
+    this.comment.style.left = commentInfo.left;
+    this.comment.style.top = commentInfo.top;
   }
-
-  registerEvents() {
-    //
-  }
-
 }
 
 class CommentBoard {
@@ -271,6 +285,7 @@ class CommentBoard {
     this.addButton = this.board.querySelector('.comments__submit');
     this.closeButton = this.board.querySelector('.comments__close');
     this.commentInput = this.board.querySelector('.comments__input');
+    this.body = this.board.querySelector('.comments__body');
 
     this.registerEvents();
   }
@@ -296,6 +311,11 @@ class CommentBoard {
 
   close() {
     //
+  }
+
+  add(commentObj) {
+    const comment = new Comment(commentObj);
+    this.body.appendChild(comment);
   }
 
 }
