@@ -2,13 +2,12 @@
 
 export default class FileLoader {
   constructor() {
-    this.connection = null;
     this.mainURL = 'https://neto-api.herokuapp.com';
     this.registerEvents();
   }
 
   registerEvents() {
-    //
+    
   }
 
   update(data, url, callback) {

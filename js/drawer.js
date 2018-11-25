@@ -2,16 +2,30 @@
 
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
+const BRUSH_RADIUS = 4;
 let needsRepaint = true;
 let lines = [];
+const colors = {
+  'red': '#EA5D56',
+  'yellow': '#F3D135',
+  'green': '#6CBE47',
+  'blue': '#53A7F5',
+  'purple': '#B36ADE'
+}
+let color = colors['green'];
 
 export default class Drawer {
-  constructor(container) {
+  constructor(container, app) {
     this.container = container;
+    this.app = app;
     canvas.width = container.offsetWidth;
     canvas.height = container.offsetHeight;
-    canvas.left = container.style.left;
-    canvas.top = container.style.top;
+    canvas.style.left = '50%';
+    canvas.style.top = '50%';
+    canvas.style.position = 'absolute';
+    canvas.style.transform = 'translate(-50%, -50%)';
+    color = colors[this.app.currentColor];
+
     document.querySelector('.app').appendChild(canvas);
     
     this.drawing = false;
@@ -52,6 +66,15 @@ export default class Drawer {
     this.container.appendChild(mask);
   }
 
+  remove() {
+    document.querySelector('.app').removeChild(canvas);
+  }
+
+  setColor(colorName) {
+    color = colors[colorName];
+    alert(color);
+  }
+
 }
 
 function debounce(callback,  delay) {
@@ -67,6 +90,7 @@ function debounce(callback,  delay) {
 function circle(point) {
   ctx.beginPath();
   ctx.arc(...point, BRUSH_RADIUS / 2, 0, 2 * Math.PI);
+  ctx.fillStyle = color;
   ctx.fill();
 }
 
@@ -77,9 +101,10 @@ function lineBetween (p1, p2) {
 
 function drawLine(points) {
   ctx.beginPath();
-  ctx.lineWidth = 4;
+  ctx.lineWidth = BRUSH_RADIUS;
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
+  ctx.strokeStyle = color;
 
   ctx.moveTo(...points[0]);
   for(let i = 1; i < points.length - 1; i++) {

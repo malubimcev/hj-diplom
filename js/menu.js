@@ -71,6 +71,11 @@ export default class Menu {
     this.app.setCommentMode(mode);
   }
 
+  changeColor() {
+    const color = this.menu.querySelector('.draw-tools input:checked').value;
+    this.app.currentColor = color;
+  }
+
   setState(item) {
     const resetState = () => {
       const modeItems = this.menu.querySelectorAll('.mode');
@@ -84,9 +89,9 @@ export default class Menu {
     this.app.resetModes();
     
     if (item.classList.contains('tool')) {
-      //if (item.dataset.state === 'selected') {
-        //console.log(event.target);
-      //}
+      if (item.classList.contains('draw-tools')) {
+        this.changeColor();
+      }
     }    
 
     if (item.classList.contains('burger')) {

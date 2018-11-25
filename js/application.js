@@ -2,6 +2,7 @@
 
 import Menu from "./menu.js";
 import FileLoader from "./loader.js";
+import Connection from "./socket.js";
 import CommentBoard from "./comments.js";
 import Drawer from "./drawer.js";
 
@@ -12,6 +13,7 @@ export default class Application {
     this.imageLoader = container.querySelector('.image-loader');
     this.currentImage = container.querySelector('.current-image');
     this.imageId = '';
+    this.currentColor = '';
     this.page = 'https://netology-code.github.io/hj-26-malubimcev/';
     this.commentsForm = container.querySelector('.comments__form');
     
@@ -28,12 +30,16 @@ export default class Application {
   }
 
   registerEvents() {
-    
+    //document.addEventListener('DOMContentLoaded', this.setPublicationMode().bind.this, false);
   }
 
   resetModes() {
     this.imageLoader.style = 'display: none;';
     this.error.style = 'display: none;';
+    if (this.drawer) {
+      this.drawer.remove();
+      this.drawer = null;
+    }
   }
 
   setPublicationMode() {
@@ -42,22 +48,41 @@ export default class Application {
   }
 
   setShareMode() {
-    this.currentImage.removeEventListener('click', (event) => console.log(event.clientX + '=' +  event.clientY));
     const id = this.imageId ? ('?id=' + this.imageId) : '';
     this.menu.linkField.value = this.page + id;
   }
 
   setCommentMode(mode) {
+    const onImageClick = (e) => this.addCommentBoard(e).bind.this;
+    this.currentImage.removeEventListener('click', onImageClick, false);
     const display = mode === 'on' ? 'display: block;' : 'display: none;';
     const markers = this.container.querySelectorAll('.comments__form');
     for (const marker of markers) {
       marker.style = display;
     }
-    this.currentImage.addEventListener('click', (event) => console.log('comment'));
+    this.currentImage.addEventListener('click', onImageClick, false);
+  }
+
+  addCommentBoard(event) {
+    const left = event.pageX;
+    const top = event.pageY;
+    console.log(left + ' ' + top);
+    const commentBoard = new CommentBoard(null, this);
+    this.container.appendChild(commentBoard.board);
+    commentBoard.board.style.left = left;
+    commentBoard.board.style.top = top;
+    commentBoard.style = 'display: block;';
   }
 
   setDrawMode() {
-    this.drawer = new Drawer(this.currentImage);
+    this.drawer = new Drawer(this.currentImage, this);
+  }
+
+  setColor(colorName) {
+    this.currentColor = colorName;
+    if (this.drawer) {
+      this.drawer.setColor(colorName);
+    }
   }
 
   setErrorMode(errMessage) {
@@ -81,6 +106,8 @@ export default class Application {
     const loader = new FileLoader();
     loader.update(formData, '/pic', (data) => {
       this.currentImage.src = data.url;
+      const onImageClick = this.addCommentBoard(e).bind.this;
+      this.currentImage.addEventListener('click', onImageClick, false);
       this.imageId = data.id;
       this.setShareMode();
     });
@@ -91,7 +118,13 @@ export default class Application {
   }
   
   loadImage() {
-    
+    const loader = new FileLoader();
+    loader.loadData('/pic/' + this.imageId)
+      .then(data => {
+        this.imageId = data.id;
+        this.currentImage.src = data.url;
+
+      });
   }
 
   getLink(id) {
