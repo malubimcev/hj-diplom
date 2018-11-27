@@ -110,10 +110,10 @@ export default class Application {
     let formData = new FormData();
     formData.append('title', 'title');
     formData.append('image', file);
-    const loader = new FileLoader();
+    console.log(formData);
+    const loader = new FileLoader(this);
     loader.update(formData, '/pic', (data) => {
       this.currentImage.src = data.url;
-      const onImageClick = this.addCommentBoard(e).bind.this;
       this.imageId = data.id;
       this.setShareMode();
     });
@@ -132,12 +132,12 @@ export default class Application {
   }
   
   loadImage() {
-    const loader = new FileLoader();
+    const loader = new FileLoader(this);
     loader.loadData('/pic/' + this.imageId)
       .then(data => {
         this.imageId = data.id;
         this.currentImage.src = data.url;
-
+        this.setShareMode();
       });
   }
 

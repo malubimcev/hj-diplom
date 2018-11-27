@@ -1,11 +1,13 @@
 'use strict';
 
 export default class FileLoader {
-  constructor() {
+  constructor(app) {
     this.mainURL = 'https://neto-api.herokuapp.com';
+    this.app = app;
   }
 
   update(data, url, callback) {
+    console.log(this.mainURL + url);
     fetch(this.mainURL + url, {
       body: data,
       method: 'POST'
@@ -17,7 +19,7 @@ export default class FileLoader {
         throw new Error(res.statusText);
       })
       .then(callback)
-      .catch(err => app.setErrorMode(err.message));  
+      .catch(err => this.app.setErrorMode(err.message));  
   }
 
   loadData(url) {
@@ -28,7 +30,7 @@ export default class FileLoader {
         }
         throw new Error(res.statusText);
       })
-      .catch(err => app.setErrorMode(err.message));
+      .catch(err => this.app.setErrorMode(err.message));
   }
 
 }
