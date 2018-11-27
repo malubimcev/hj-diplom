@@ -33,7 +33,7 @@ export default class Application {
   }
 
   registerEvents() {
-    //document.addEventListener('DOMContentLoaded', this.setPublicationMode().bind.this, false);
+    this.container.addEventListener('drop', this.onDrop.bind(this), false);
   }
 
   resetModes() {
@@ -78,7 +78,7 @@ export default class Application {
   }
 
   addComment(commentObj) {
-
+    //
   }
 
   setDrawMode() {
@@ -100,23 +100,36 @@ export default class Application {
 
   selectFile() {
     const fileInput = document.createElement('input');
+    fileInput.setAttribute('type', 'file');
+    fileInput.setAttribute('accept', 'image/jpeg, image/png');
     fileInput.addEventListener('change', () => this.uploadFile(fileInput.files[0]), false);
-    fileInput.type = 'file';
     fileInput.click();
   }
 
   uploadFile(file) {
     this.imageLoader.style = 'display: block;';
+    this.error.style = 'display: none;';
     let formData = new FormData();
     formData.append('title', 'title');
     formData.append('image', file);
-    console.log(formData);
     const loader = new FileLoader(this);
-    loader.update(formData, '/pic', (data) => {
+    loader.update(formData, '/pic', 'multipart/form-data', (data) => {
       this.currentImage.src = data.url;
       this.imageId = data.id;
       this.setShareMode();
     });
+  }
+
+  onDrop(event) {
+    event.preventDefault();
+    // event.stopPropagation();
+    const file = event.dataTransfer.files[0];
+    const fileType = /^image\//;
+    if (file && file.type.match(fileType)) {
+      this.uploadFile(file);
+    } else {
+      this.setErrorMode(this.fileTypeErrorMessage);
+    }    
   }
   
   uploadMask(img) {

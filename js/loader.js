@@ -6,13 +6,13 @@ export default class FileLoader {
     this.app = app;
   }
 
-  update(data, url, callback) {
+  update(data, url, type, callback) {
     console.log(this.mainURL + url);
     fetch(this.mainURL + url, {
       body: data,
       method: 'POST',
       headers: {
-        'Content-Type':'multipart/form-data'
+        'Content-Type': type
       }
     })
       .then(res => {

@@ -102,10 +102,11 @@ export default class CommentBoard {
     formData.append('message', this.commentInput.textContent);
     const loader = new FileLoader();
     const url = '/pic/' + this.app.getPicId() + '/comments'
-    loader.update(formData, url, (data) => {
-      this.currentImage.src = data.url;
-      this.imageId = data.id;
-      this.setShareMode();
+    const type = 'application/x-www-form-urlencoded';
+    loader.update(formData, url, type, (data) => {
+      this.app.currentImage.src = data.url;
+      this.app.imageId = data.id;
+      this.app.setShareMode();
     });
   }
 
