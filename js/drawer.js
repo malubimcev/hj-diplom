@@ -11,7 +11,7 @@ const colors = {
   'green': '#6CBE47',
   'blue': '#53A7F5',
   'purple': '#B36ADE'
-}
+};
 let color = colors['green'];
 
 export default class Drawer {
@@ -63,16 +63,20 @@ export default class Drawer {
   newMask() {
     const mask = document.createElement('img');
     mask.src = canvas.toDataURL();
-    this.container.appendChild(mask);
+    this.clear();
+    this.app.uploadMask(mask);
   }
 
   remove() {
     document.querySelector('.app').removeChild(canvas);
   }
 
+  clear() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
   setColor(colorName) {
     color = colors[colorName];
-    alert(color);
   }
 
 }

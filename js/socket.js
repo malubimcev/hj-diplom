@@ -1,8 +1,9 @@
 'use strict';
 
 export default class WSConnection {
-  constructor(id) {
-    this.URL = `wss://neto-api.herokuapp.com/pic/${id}`;
+  constructor(app) {
+    this.app = app;
+    this.URL = `wss://neto-api.herokuapp.com/pic/${this.app.imageId}`;
     this.ws = new WebSocket(this.URL);
     this.registerEvents();
   }
@@ -18,7 +19,17 @@ export default class WSConnection {
   onMessage(event) {
     try {
       const msg = event.data;
-      //
+      switch(msg.event) {
+        case 'pic':
+          this.app.loadImage();
+          break;
+        case 'comment':
+          this.app.addComment(msg.comment);
+          break;
+        case 'mask':
+          this.app.addMask(msg.mask);
+          break;
+      }
     } catch (err) {
       console.log(`ws message error: ${err.message}`)
     }

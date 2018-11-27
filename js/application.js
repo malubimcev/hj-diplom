@@ -2,7 +2,7 @@
 
 import Menu from "./menu.js";
 import FileLoader from "./loader.js";
-import Connection from "./socket.js";
+import WSConnection from "./socket.js";
 import CommentBoard from "./comments.js";
 import Drawer from "./drawer.js";
 
@@ -13,7 +13,7 @@ export default class Application {
     this.imageLoader = container.querySelector('.image-loader');
     this.currentImage = container.querySelector('.current-image');
     this.imageId = '';
-    this.currentColor = '';
+    this.currentColor = 'green';
     this.page = 'https://netology-code.github.io/hj-26-malubimcev/';
     this.commentsForm = container.querySelector('.comments__form');
     
@@ -22,9 +22,12 @@ export default class Application {
     this.fileTypeErrorMessage = 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.';
     this.fileLoadErrorMessage = 'Чтобы загрузить новое изображение, пожалуйста, воспользуйтесь пунктом "Загрузить новое" в меню.';
     this.menu = new Menu(container.querySelector('.menu'), this);
+    this.drawer = null;
+
+    // this.ws = new WSConnection(this);
 
     this.registerEvents();
-    this.setCommentMode('on');
+    //this.setCommentMode('on');
     this.setPublicationMode();
     //this.setDrawMode();
   }
@@ -44,7 +47,8 @@ export default class Application {
 
   setPublicationMode() {
     this.imageLoader.style = 'display: none;';
-    
+    this.currentImage.src = '';
+    this.menu.setPublicationState();
   }
 
   setShareMode() {
@@ -53,7 +57,7 @@ export default class Application {
   }
 
   setCommentMode(mode) {
-    const onImageClick = (e) => this.addCommentBoard(e).bind.this;
+    const onImageClick = this.addCommentBoard.bind.this;
     this.currentImage.removeEventListener('click', onImageClick, false);
     const display = mode === 'on' ? 'display: block;' : 'display: none;';
     const markers = this.container.querySelectorAll('.comments__form');
@@ -64,14 +68,17 @@ export default class Application {
   }
 
   addCommentBoard(event) {
-    const left = event.pageX;
-    const top = event.pageY;
-    console.log(left + ' ' + top);
+    const left = event.layerX;
+    const top = event.layerY;
     const commentBoard = new CommentBoard(null, this);
     this.container.appendChild(commentBoard.board);
     commentBoard.board.style.left = left;
     commentBoard.board.style.top = top;
     commentBoard.style = 'display: block;';
+  }
+
+  addComment(commentObj) {
+
   }
 
   setDrawMode() {
@@ -81,7 +88,7 @@ export default class Application {
   setColor(colorName) {
     this.currentColor = colorName;
     if (this.drawer) {
-      this.drawer.setColor(colorName);
+      this.drawer.setColor(this.currentColor);
     }
   }
 
@@ -107,10 +114,17 @@ export default class Application {
     loader.update(formData, '/pic', (data) => {
       this.currentImage.src = data.url;
       const onImageClick = this.addCommentBoard(e).bind.this;
-      this.currentImage.addEventListener('click', onImageClick, false);
       this.imageId = data.id;
       this.setShareMode();
     });
+  }
+  
+  uploadMask(img) {
+    this.ws.send(img);
+  }
+
+  addMask(mask) {
+
   }
 
   getPicId() {

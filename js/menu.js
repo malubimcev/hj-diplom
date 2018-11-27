@@ -24,6 +24,7 @@ export default class Menu {
     this.showComments = container.querySelectorAll('input[name="toggle"]');
     this.linkField = container.querySelector('.menu__url');
     this.copyLinkBtn = container.querySelector('.menu_copy');
+    this.burger = container.querySelector('.burger');
 
     this.onMove = throttle(event => {
       if (this.draggedMenu) {
@@ -48,7 +49,7 @@ export default class Menu {
   }
 
   registerEvents() {
-    this.menu.addEventListener('click', (event) => this.setState(this.getMenuItem(event)).bind(this), false);
+    this.menu.addEventListener('click', this.setState.bind(this), false);
     this.drag.addEventListener('mousedown', (event) => this.draggedMenu = this.menu, false);
     document.addEventListener('mousemove', this.onMove.bind(this));
     Array.from(this.showComments).forEach(item => item.addEventListener('change', this.changeCommentMode.bind(this), false));
@@ -62,10 +63,6 @@ export default class Menu {
 
   }
 
-  getMenuItem(event) {
-    return event.target.classList.contains('menu__item') ? event.target : event.target.parentElement;
-  }
-  
   changeCommentMode() {
     const mode = this.menu.querySelector('.menu__toggle-bg input:checked').value;
     this.app.setCommentMode(mode);
@@ -73,21 +70,28 @@ export default class Menu {
 
   changeColor() {
     const color = this.menu.querySelector('.draw-tools input:checked').value;
-    this.app.currentColor = color;
+    this.app.setColor(color);
   }
 
-  setState(item) {
-    const resetState = () => {
-      const modeItems = this.menu.querySelectorAll('.mode');
-      for (const modeItem of modeItems) {
-        if (modeItem.dataset.state) {
-          modeItem.dataset.state = '';
-        }
+  resetState() {
+    const modeItems = this.menu.querySelectorAll('.mode');
+    for (const modeItem of modeItems) {
+      if (modeItem.dataset.state) {
+        modeItem.dataset.state = '';
       }
-    }
+    }    
+  }
 
-    this.app.resetModes();
-    
+  setPublicationState() {
+    //this.resetState();
+    this.menu.dataset.state = 'initial';
+    this.burger.style = 'display: none;';
+  }
+
+  setState(event) {
+    const item = event.target.classList.contains('menu__item') ? event.target : event.target.parentElement;
+    console.log(event.target.className);
+
     if (item.classList.contains('tool')) {
       if (item.classList.contains('draw-tools')) {
         this.changeColor();
@@ -95,7 +99,7 @@ export default class Menu {
     }    
 
     if (item.classList.contains('burger')) {
-      resetState();
+      this.resetState();
       this.menu.dataset.state = 'default';
     }
 
@@ -113,7 +117,7 @@ export default class Menu {
     }
 
     if (item.classList.contains('mode')) {
-      resetState();
+      this.resetState();
       this.menu.dataset.state = 'selected';
       item.dataset.state = 'selected';
       if (item.classList.contains('draw')) {
