@@ -14,7 +14,7 @@ function throttle(callback) {
 }
 
 export default class Menu {
-  constructor(container, app = null) {
+  constructor(container, app) {
     this.menu = container;
     this.app = app;
     this.menuItems = container.querySelectorAll('.menu__item');
