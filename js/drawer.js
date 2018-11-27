@@ -63,8 +63,8 @@ export default class Drawer {
   newMask() {
     const mask = document.createElement('img');
     mask.src = canvas.toDataURL();
-    this.clear();
     this.app.uploadMask(mask);
+    this.clear();
   }
 
   remove() {
@@ -134,4 +134,4 @@ function tick () {
   window.requestAnimationFrame(tick);
 }
 
-tick();
+// tick();

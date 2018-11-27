@@ -10,7 +10,8 @@ export default class FileLoader {
     console.log(this.mainURL + url);
     fetch(this.mainURL + url, {
       body: data,
-      method: 'POST'
+      method: 'POST',
+      Content-Type: 'multipart/form-data'
     })
       .then(res => {
         if (200 <= res.status && res.status < 300) {
