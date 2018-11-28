@@ -58,6 +58,7 @@ export default class Drawer {
     ['mouseup', 'mouseleave'].forEach(evName => canvas.addEventListener(evName, () => this.drawing = false));
     
     canvas.addEventListener('mouseup', this.newMask.bind(this), false);
+    canvas.addEventListener('click', this.app.addCommentBoard, false);
   }
 
   newMask() {
@@ -68,7 +69,7 @@ export default class Drawer {
     this.clear();
   }
 
-  remove() {
+  removeCanvas() {
     document.querySelector('.app').removeChild(canvas);
   }
 

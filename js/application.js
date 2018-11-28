@@ -25,6 +25,8 @@ export default class Application {
     this.menu = new Menu(container.querySelector('.menu'), this);
     this.drawer = null;
 
+    this.connection = null;
+
     this.registerEvents();
     //this.setCommentMode('on');
     this.setPublicationMode();
@@ -41,7 +43,7 @@ export default class Application {
     this.imageLoader.style = 'display: none;';
     this.error.style = 'display: none;';
     if (this.drawer) {
-      this.drawer.remove();
+      this.drawer.removeCanvas();
       this.drawer = null;
     }
   }
@@ -77,7 +79,7 @@ export default class Application {
     this.container.appendChild(commentBoard.board);
     commentBoard.board.style.left = left;
     commentBoard.board.style.top = top;
-    commentBoard.style = 'display: block;';
+    commentBoard.board.style = 'display: block;';
   }
 
   addComment(commentObj) {
@@ -85,7 +87,7 @@ export default class Application {
   }
 
   setDrawMode() {
-    this.drawer = new Drawer(this.currentImage, this);
+    //
   }
 
   setColor(colorName) {
@@ -116,13 +118,7 @@ export default class Application {
     formData.append('title', file.name);
     formData.append('image', file, file.name);
     const loader = new FileLoader(this);
-    loader.upload(formData, '/pic', (data) => {
-      this.imageLoader.style = 'display: none;';
-      console.log(data);
-      this.currentImage.src = data.url;
-      this.imageId = data.id;
-      this.setShareMode();
-    });
+    loader.upload(formData, '/pic', onFileUploaded);
   }
 
   onDrop(event) {
@@ -132,9 +128,18 @@ export default class Application {
       this.uploadFile(file);
     } else {
       this.setErrorMode(this.fileTypeErrorMessage);
-    }    
+    }
   }
   
+  onFileUploaded(data) {
+    this.imageLoader.style = 'display: none;';
+    this.currentImage.src = data.url;
+    this.imageId = data.id;
+    this.connection = new WSConnection(this);
+    this.drawer = new Drawer(this.currentImage, this);
+    this.setShareMode();
+  }
+
   uploadMask(img) {
     this.ws.send(img);
   }

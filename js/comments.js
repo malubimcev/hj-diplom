@@ -103,9 +103,9 @@ export default class CommentBoard {
     const loader = new FileLoader();
     const url = '/pic/' + this.app.getPicId() + '/comments'
     loader.upload(formData, url, (data) => {
-      this.app.currentImage.src = data.url;
-      this.app.imageId = data.id;
-      this.app.setShareMode();
+      // this.app.currentImage.src = data.url;
+      // this.app.imageId = data.id;
+      // this.app.setShareMode();
     });
   }
 
