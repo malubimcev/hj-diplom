@@ -33,6 +33,9 @@ export default class Application {
   }
 
   registerEvents() {
+    ['dragenter', 'dragover', 'drop'].forEach(eventName => {
+      this.container.addEventListener(eventName, event => event.preventDefault(), false);
+    });
     this.container.addEventListener('drop', this.onDrop.bind(this), false);
   }
 
@@ -109,11 +112,11 @@ export default class Application {
   uploadFile(file) {
     this.imageLoader.style = 'display: block;';
     this.error.style = 'display: none;';
-    let formData = new FormData();
+    const formData = new FormData();
     formData.append('title', 'title');
-    formData.append('image', file);
+    formData.append('image', file, 'image');
     const loader = new FileLoader(this);
-    loader.update(formData, '/pic', 'multipart/form-data', (data) => {
+    loader.upload(formData, '/pic', 'multipart/form-data', (data) => {
       this.currentImage.src = data.url;
       this.imageId = data.id;
       this.setShareMode();
@@ -121,8 +124,6 @@ export default class Application {
   }
 
   onDrop(event) {
-    event.preventDefault();
-    // event.stopPropagation();
     const file = event.dataTransfer.files[0];
     const fileType = /^image\//;
     if (file && file.type.match(fileType)) {

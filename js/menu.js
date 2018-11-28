@@ -90,7 +90,7 @@ export default class Menu {
 
   setState(event) {
     const item = event.target.classList.contains('menu__item') ? event.target : event.target.parentElement;
-    console.log(event.target.className);
+    // console.log(event.target.className);
 
     if (item.classList.contains('tool')) {
       if (item.classList.contains('draw-tools')) {

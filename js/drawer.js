@@ -63,7 +63,8 @@ export default class Drawer {
   newMask() {
     const mask = document.createElement('img');
     mask.src = canvas.toDataURL();
-    this.app.uploadMask(mask);
+    this.container.appendChild(mask);
+    setTimeout(this.app.uploadMask(mask), 1000);
     this.clear();
   }
 
