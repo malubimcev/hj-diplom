@@ -83,14 +83,12 @@ export default class Menu {
   }
 
   setPublicationState() {
-    //this.resetState();
     this.menu.dataset.state = 'initial';
     this.burger.style = 'display: none;';
   }
 
   setState(event) {
     const item = event.target.classList.contains('menu__item') ? event.target : event.target.parentElement;
-    // console.log(event.target.className);
 
     if (item.classList.contains('tool')) {
       if (item.classList.contains('draw-tools')) {
@@ -135,5 +133,4 @@ export default class Menu {
       .then()
       .catch(err => console.log('Ошибка копирования в буфер', err));
   }
-
 }

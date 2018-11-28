@@ -9,7 +9,7 @@ import Drawer from "./drawer.js";
 export default class Application {
   constructor(container) {
     this.container = container;
-    
+
     this.imageLoader = container.querySelector('.image-loader');
     this.currentImage = container.querySelector('.current-image');
     this.imageId = '';
@@ -21,15 +21,13 @@ export default class Application {
     this.errorMessage = container.querySelector('.error__message');
     this.fileTypeErrorMessage = 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.';
     this.fileLoadErrorMessage = 'Чтобы загрузить новое изображение, пожалуйста, воспользуйтесь пунктом "Загрузить новое" в меню.';
+
     this.menu = new Menu(container.querySelector('.menu'), this);
     this.drawer = null;
-
-    // this.ws = new WSConnection(this);
 
     this.registerEvents();
     //this.setCommentMode('on');
     this.setPublicationMode();
-    //this.setDrawMode();
   }
 
   registerEvents() {
@@ -49,18 +47,18 @@ export default class Application {
   }
 
   setPublicationMode() {
-    this.imageLoader.style = 'display: none;';
     this.currentImage.src = '';
     this.menu.setPublicationState();
   }
 
   setShareMode() {
+    this.imageLoader.style = 'display: none;';
     const id = this.imageId ? ('?id=' + this.imageId) : '';
     this.menu.linkField.value = this.page + id;
   }
 
   setCommentMode(mode) {
-    const onImageClick = this.addCommentBoard.bind.this;
+    const onImageClick = this.addCommentBoard.bind(this);
     this.currentImage.removeEventListener('click', onImageClick, false);
     const display = mode === 'on' ? 'display: block;' : 'display: none;';
     const markers = this.container.querySelectorAll('.comments__form');
@@ -71,8 +69,10 @@ export default class Application {
   }
 
   addCommentBoard(event) {
-    const left = event.layerX;
-    const top = event.layerY;
+    const left = parseInt(event.currentTarget.style.left) - img.getBoundingClientRect().x;
+    const top = parseInt(event.currentTarget.style.top) - img.getBoundingClientRect().y;
+    //const left = event.layerX;
+    // const top = event.layerY;
     const commentBoard = new CommentBoard(null, this);
     this.container.appendChild(commentBoard.board);
     commentBoard.board.style.left = left;
@@ -117,6 +117,8 @@ export default class Application {
     formData.append('image', file, file.name);
     const loader = new FileLoader(this);
     loader.upload(formData, '/pic', (data) => {
+      this.imageLoader.style = 'display: none;';
+      console.log(data);
       this.currentImage.src = data.url;
       this.imageId = data.id;
       this.setShareMode();
