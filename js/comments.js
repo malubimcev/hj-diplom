@@ -102,8 +102,7 @@ export default class CommentBoard {
     formData.append('message', this.commentInput.textContent);
     const loader = new FileLoader();
     const url = '/pic/' + this.app.getPicId() + '/comments'
-    const type = 'application/x-www-form-urlencoded; charset=utf-8';
-    loader.upload(formData, url, type, (data) => {
+    loader.upload(formData, url, (data) => {
       this.app.currentImage.src = data.url;
       this.app.imageId = data.id;
       this.app.setShareMode();

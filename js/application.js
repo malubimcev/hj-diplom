@@ -113,10 +113,10 @@ export default class Application {
     this.imageLoader.style = 'display: block;';
     this.error.style = 'display: none;';
     const formData = new FormData();
-    formData.append('title', 'title');
-    formData.append('image', file, 'image');
+    formData.append('title', file.name);
+    formData.append('image', file, file.name);
     const loader = new FileLoader(this);
-    loader.upload(formData, '/pic', 'multipart/form-data', (data) => {
+    loader.upload(formData, '/pic', (data) => {
       this.currentImage.src = data.url;
       this.imageId = data.id;
       this.setShareMode();
@@ -138,7 +138,7 @@ export default class Application {
   }
 
   addMask(mask) {
-
+    this.currentImage.appendChild(mask);
   }
 
   getPicId() {
@@ -151,6 +151,12 @@ export default class Application {
       .then(data => {
         this.imageId = data.id;
         this.currentImage.src = data.url;
+        if (data.mask) {
+          this.addMask(data.mask);
+        }
+        if (data.comments) {
+          data.comments.forEach(this.addComment);
+        }
         this.setShareMode();
       });
   }

@@ -6,13 +6,10 @@ export default class FileLoader {
     this.app = app;
   }
 
-  upload(data, url, type, callback) {
+  upload(data, url, callback) {
     fetch(this.mainURL + url, {
       body: data,
-      method: 'POST',
-      headers: {
-        'Content-Type': type
-      }
+      method: 'POST'
     })
       .then(res => {
         if (200 <= res.status && res.status < 300) {
@@ -24,7 +21,7 @@ export default class FileLoader {
       .catch(err => this.app.setErrorMode(err.message));  
   }
 
-  // upload(data, url, type, callback) {
+  // upload(data, url, callback) {
   //   const xhr = new XMLHttpRequest();
   //   xhr.addEventListener('load', (res) => {
   //     if (200 <= res.status && res.status < 300) {
@@ -35,7 +32,6 @@ export default class FileLoader {
   //   });
   //   xhr.addEventListener('error', () => this.app.setErrorMode(xhr.error));
   //   xhr.open('POST', this.mainURL + url, true);
-  //   xhr.setRequestHeader('Content-Type', type);
   //   xhr.send(data);
   // }
 
