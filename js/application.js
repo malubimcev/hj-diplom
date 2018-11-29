@@ -54,9 +54,9 @@ export default class Application {
   }
 
   setShareMode() {
-    this.imageLoader.style = 'display: none;';
     const id = this.imageId ? ('?id=' + this.imageId) : '';
     this.menu.linkField.value = this.page + id;
+    this.menu.setEditState();
   }
 
   setCommentMode(mode) {
@@ -118,7 +118,7 @@ export default class Application {
     formData.append('title', file.name);
     formData.append('image', file, file.name);
     const loader = new FileLoader(this);
-    loader.upload(formData, '/pic', onFileUploaded);
+    loader.upload(formData, '/pic', this.onFileUploaded);
   }
 
   onDrop(event) {

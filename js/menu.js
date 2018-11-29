@@ -20,7 +20,7 @@ export default class Menu {
     this.menuItems = container.querySelectorAll('.menu__item');
     this.drag = container.querySelector('.drag');
     this.draggedMenu = null;
-    this.menuWidth = this.menu.offsetWidth;
+    // this.menuWidth = this.menu.offsetWidth;
     this.showComments = container.querySelectorAll('input[name="toggle"]');
     this.linkField = container.querySelector('.menu__url');
     this.copyLinkBtn = container.querySelector('.menu_copy');
@@ -32,7 +32,7 @@ export default class Menu {
         let x = event.pageX - this.drag.offsetWidth / 2;
         let y = event.pageY - this.drag.offsetHeight / 2;
 
-        const xMax = window.innerWidth - this.menuWidth - 2;
+        const xMax = window.innerWidth - this.menu.offsetWidth - 2;
         const yMax = window.innerHeight - this.menu.offsetHeight - 2;
 
         x = Math.min(x, xMax);
@@ -87,6 +87,11 @@ export default class Menu {
     this.burger.style = 'display: none;';
   }
 
+  setEditState() {
+    this.menu.dataset.state = 'selected';
+    this.burger.style = 'display: inline-block;';
+  }
+
   setState(event) {
     const item = event.target.classList.contains('menu__item') ? event.target : event.target.parentElement;
 
@@ -102,6 +107,10 @@ export default class Menu {
     }
 
     if (item.classList.contains('new')) {
+      if (this.menu.dataset.state === 'initial') {
+        this.app.selectFile();
+        return;
+      }      
       if (item.dataset.state === 'selected') {
         this.app.selectFile();
       }
@@ -125,7 +134,7 @@ export default class Menu {
       }
     }
 
-    this.menuWidth = this.menu.offsetWidth;
+    // this.menuWidth = this.menu.offsetWidth;
   }
 
   copyLink() {
