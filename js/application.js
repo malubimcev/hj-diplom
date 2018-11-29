@@ -15,6 +15,7 @@ export default class Application {
     this.imageId = '';
     this.currentColor = 'green';
     this.page = 'https://netology-code.github.io/hj-26-malubimcev/';
+
     this.commentsForm = container.querySelector('.comments__form');
     
     this.error = container.querySelector('.error');
@@ -25,17 +26,23 @@ export default class Application {
     this.menu = new Menu(container.querySelector('.menu'), this);
     this.drawer = null;
 
+    this.currentMode = '';
     this.connection = null;
 
     this.registerEvents();
     //this.setCommentMode('on');
-    this.setPublicationMode();
+    // this.setPublicationMode();//включить после отладки
+    this.drawer = new Drawer(this.currentImage, this);//отладка, удалить
+    this.setShareMode();//отладка, удалить
   }
 
   registerEvents() {
     ['dragenter', 'dragover', 'drop'].forEach(eventName => {
       this.container.addEventListener(eventName, event => event.preventDefault(), false);
     });
+    this.container.addEventListener('dragstart', () => {
+
+    }, false);
     this.container.addEventListener('drop', this.onDrop.bind(this), false);
   }
 
@@ -49,30 +56,30 @@ export default class Application {
   }
 
   setPublicationMode() {
+    this.currentMode = 'publication';
     this.currentImage.src = '';
     this.menu.setPublicationState();
   }
 
   setShareMode() {
+    this.currentMode = 'share';
     const id = this.imageId ? ('?id=' + this.imageId) : '';
     this.menu.linkField.value = this.page + id;
     this.menu.setEditState();
   }
 
   setCommentMode(mode) {
-    const onImageClick = this.addCommentBoard.bind(this);
-    this.currentImage.removeEventListener('click', onImageClick, false);
+    this.currentMode = 'comments';
     const display = mode === 'on' ? 'display: block;' : 'display: none;';
     const markers = this.container.querySelectorAll('.comments__form');
     for (const marker of markers) {
       marker.style = display;
     }
-    this.currentImage.addEventListener('click', onImageClick, false);
   }
 
   addCommentBoard(event) {
-    const left = parseInt(event.currentTarget.style.left) - img.getBoundingClientRect().x;
-    const top = parseInt(event.currentTarget.style.top) - img.getBoundingClientRect().y;
+    const left = parseInt(event.currentTarget.style.left) - this.currentImage.getBoundingClientRect().x;
+    const top = parseInt(event.currentTarget.style.top) - this.currentImage.getBoundingClientRect().y;
     //const left = event.layerX;
     // const top = event.layerY;
     const commentBoard = new CommentBoard(null, this);
@@ -87,7 +94,7 @@ export default class Application {
   }
 
   setDrawMode() {
-    //
+    this.currentMode = 'draw';
   }
 
   setColor(colorName) {
@@ -98,6 +105,7 @@ export default class Application {
   }
 
   setErrorMode(errMessage) {
+    this.currentMode = 'error';
     this.imageLoader.style = 'display: none;';
     this.error.style = 'display: block;';
     this.errorMessage.textContent = errMessage;
@@ -132,12 +140,18 @@ export default class Application {
   }
   
   onFileUploaded(data) {
-    this.imageLoader.style = 'display: none;';
     this.currentImage.src = data.url;
     this.imageId = data.id;
-    this.connection = new WSConnection(this);
+    this.imageLoader.style = 'display: none;';
     this.drawer = new Drawer(this.currentImage, this);
+    this.connection = new WSConnection(this);
     this.setShareMode();
+  }
+
+  onClick(event) {
+    if (this.currentMode === 'comments') {
+      this.addCommentBoard(event);
+    }
   }
 
   uploadMask(img) {

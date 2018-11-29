@@ -79,7 +79,8 @@ export default class Menu {
       if (modeItem.dataset.state) {
         modeItem.dataset.state = '';
       }
-    }    
+    }
+    this.app.currentMode = '';
   }
 
   setPublicationState() {
@@ -107,6 +108,7 @@ export default class Menu {
     }
 
     if (item.classList.contains('new')) {
+      this.app.currentMode = 'publication';
       if (this.menu.dataset.state === 'initial') {
         this.app.selectFile();
         return;
@@ -117,6 +119,7 @@ export default class Menu {
     }
     
     if (item.classList.contains('comments')) {
+      this.app.currentMode = 'comments';
       if (item.dataset.state === 'selected') {
         this.changeCommentMode();
         
@@ -129,8 +132,12 @@ export default class Menu {
       item.dataset.state = 'selected';
       if (item.classList.contains('draw')) {
         this.app.setDrawMode();
-      } else {
+      }
+      if (item.classList.contains('share')) {
         this.app.setShareMode();
+      }
+      if (item.classList.contains('comments')) {
+        this.app.setCommentMode();
       }
     }
 

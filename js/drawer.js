@@ -39,15 +39,17 @@ export default class Drawer {
     }, 500);
 
     canvas.addEventListener('mousedown', (evt) => {
-      this.drawing = true;
-      const line = [];
-      line.push([evt.offsetX, evt.offsetY]);
-      lines.push(line);
-      needsRepaint = true;
+      if (this.app.currentMode === 'draw') {
+        this.drawing = true;
+        const line = [];
+        line.push([evt.offsetX, evt.offsetY]);
+        lines.push(line);
+        needsRepaint = true;
+      }
     });
 
     canvas.addEventListener('mousemove', (evt) => {
-      if (this.drawing) {
+      if (this.app.currentMode === 'draw' && this.drawing) {
         const point = [evt.offsetX, evt.offsetY];
         lines[lines.length - 1].push(point);
         needsRepaint = true;
@@ -58,15 +60,17 @@ export default class Drawer {
     ['mouseup', 'mouseleave'].forEach(evName => canvas.addEventListener(evName, () => this.drawing = false));
     
     canvas.addEventListener('mouseup', this.newMask.bind(this), false);
-    canvas.addEventListener('click', this.app.addCommentBoard, false);
+    canvas.addEventListener('click', this.app.onClick.bind(this.app), false);
   }
 
   newMask() {
-    const mask = document.createElement('img');
-    mask.src = canvas.toDataURL();
-    this.container.appendChild(mask);
-    setTimeout(this.app.uploadMask(mask), 1000);
-    this.clear();
+    if (this.app.currentMode === 'draw') {
+      const mask = createMask(this.container);
+      const node = this.app.container.querySelector('.error');
+      this.app.container.insertBefore(mask, node);
+      this.clear();
+      //setTimeout(this.app.uploadMask(mask), 1000);//включить после отладки      
+    }
   }
 
   removeCanvas() {
@@ -74,6 +78,7 @@ export default class Drawer {
   }
 
   clear() {
+    lines = [];
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
@@ -82,6 +87,18 @@ export default class Drawer {
   }
 
 }
+
+function createMask(container) {
+  const mask = container.cloneNode();
+  mask.style.left = canvas.style.left;
+  mask.style.top = canvas.style.top;
+  mask.width = canvas.width;
+  mask.height = canvas.height;
+  mask.style.zIndex = container.style.zIndex + 1;
+  canvas.style.zIndex = mask.style.zIndex + 1;
+  mask.src = canvas.toDataURL();
+  return mask;
+};
 
 function debounce(callback,  delay) {
   return () => {
