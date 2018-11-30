@@ -25,15 +25,14 @@ export default class Application {
 
     this.menu = new Menu(container.querySelector('.menu'), this);
     this.drawer = null;
-
     this.currentMode = '';
     this.connection = null;
 
     this.registerEvents();
     //this.setCommentMode('on');
-    // this.setPublicationMode();//включить после отладки
-    this.drawer = new Drawer(this.currentImage, this);//отладка, удалить
-    this.setShareMode();//отладка, удалить
+    this.setPublicationMode();//включить после отладки
+    // this.drawer = new Drawer(this.currentImage, this);//отладка, удалить
+    // this.setShareMode();//отладка, удалить
   }
 
   registerEvents() {
@@ -78,15 +77,15 @@ export default class Application {
   }
 
   addCommentBoard(event) {
-    const left = parseInt(event.currentTarget.style.left) - this.currentImage.getBoundingClientRect().x;
-    const top = parseInt(event.currentTarget.style.top) - this.currentImage.getBoundingClientRect().y;
-    //const left = event.layerX;
-    // const top = event.layerY;
+    // const left = parseInt(event.currentTarget.style.left) - this.currentImage.getBoundingClientRect().x;
+    // const top = parseInt(event.currentTarget.style.top) - this.currentImage.getBoundingClientRect().y;
+    const left = event.layerX;
+    const top = event.layerY;
     const commentBoard = new CommentBoard(null, this);
-    this.container.appendChild(commentBoard.board);
     commentBoard.board.style.left = left;
     commentBoard.board.style.top = top;
-    commentBoard.board.style = 'display: block;';
+    this.container.appendChild(commentBoard.board);
+    //commentBoard.board.style = 'display: block;';
   }
 
   addComment(commentObj) {
@@ -126,7 +125,7 @@ export default class Application {
     formData.append('title', file.name);
     formData.append('image', file, file.name);
     const loader = new FileLoader(this);
-    loader.upload(formData, '/pic', this.onFileUploaded);
+    loader.upload(formData, '/pic', this.onFileUploaded.bind(this));
   }
 
   onDrop(event) {
@@ -155,31 +154,36 @@ export default class Application {
   }
 
   uploadMask(img) {
-    this.ws.send(img);
+    this.connection.send(img);
   }
 
-  addMask(mask) {
+  addMask(maskSrc) {
+    const mask = this.currentImage.cloneNode();
+    mask.style.left = this.currentImage.style.left;
+    mask.style.top = this.currentImage.style.top;
+    mask.width = this.currentImage.width;
+    mask.height = this.currentImage.height;
+    mask.style.zIndex = this.currentImage.style.zIndex + 1;
+    mask.src = maskSrc;
     this.currentImage.appendChild(mask);
   }
 
-  getPicId() {
-    return this.imageId;
-  }
-  
   loadImage() {
     const loader = new FileLoader(this);
     loader.loadData('/pic/' + this.imageId)
-      .then(data => {
-        this.imageId = data.id;
-        this.currentImage.src = data.url;
-        if (data.mask) {
-          this.addMask(data.mask);
-        }
-        if (data.comments) {
-          data.comments.forEach(this.addComment);
-        }
-        this.setShareMode();
-      });
+      .then(this.updatePage.bind(this));
+  }
+
+  updatePage(data) {
+    this.imageId = data.id;
+    this.currentImage.src = data.url;
+    if (data.mask) {
+      this.addMask(data.mask);
+    }
+    if (data.comments) {
+      data.comments.forEach(this.addComment);
+    }
+    this.setShareMode();
   }
 
   getLink(id) {

@@ -20,7 +20,6 @@ function createBoard() {
   loaderWrap.classList.add('comment');
 
   const loader = document.createElement('div');
-  loader.classList.add('loader');
   for (let i = 0; i < 5; i++) {
     const span = document.createElement('span');
     loader.appendChild(span);
@@ -86,6 +85,7 @@ export default class CommentBoard {
     this.closeButton = this.board.querySelector('.comments__close');
     this.commentInput = this.board.querySelector('.comments__input');
     this.body = this.board.querySelector('.comments__body');
+    this.commentLoader = this.board.querySelector('.comment div');
 
     this.registerEvents();
   }
@@ -95,27 +95,28 @@ export default class CommentBoard {
     this.addButton.addEventListener('click', this.sendComment.bind(this));
   }
 
-  sendComment() {
+  sendComment(event) {
+  	event.preventDefault();
     let formData = new FormData(this.board);
     formData.append('left', this.board.style.left);
     formData.append('top', this.board.style.top);
     formData.append('message', this.commentInput.textContent);
     const loader = new FileLoader();
-    const url = '/pic/' + this.app.getPicId() + '/comments'
+    const url = '/pic/' + this.app.imageId + '/comments';
+    this.commentLoader.classList.add('loader');
     loader.upload(formData, url, (data) => {
-      // this.app.currentImage.src = data.url;
-      // this.app.imageId = data.id;
-      // this.app.setShareMode();
+    	this.commentLoader.classList.remove('loader');
+    	this.app.updatePage(data);
     });
   }
 
   close() {
-    this.board.style = 'display: none;';
+    this.body.style = 'display: none;';
   }
 
   addComment(commentObj) {
     const comment = createComment(commentObj);
-    this.body.appendChild(comment);
+    this.body.insertBefore(comment, this.commentLoader);
   }
 
 }

@@ -20,7 +20,6 @@ export default class Menu {
     this.menuItems = container.querySelectorAll('.menu__item');
     this.drag = container.querySelector('.drag');
     this.draggedMenu = null;
-    // this.menuWidth = this.menu.offsetWidth;
     this.showComments = container.querySelectorAll('input[name="toggle"]');
     this.linkField = container.querySelector('.menu__url');
     this.copyLinkBtn = container.querySelector('.menu_copy');
@@ -140,8 +139,6 @@ export default class Menu {
         this.app.setCommentMode();
       }
     }
-
-    // this.menuWidth = this.menu.offsetWidth;
   }
 
   copyLink() {

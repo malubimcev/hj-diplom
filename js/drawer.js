@@ -69,7 +69,7 @@ export default class Drawer {
       const node = this.app.container.querySelector('.error');
       this.app.container.insertBefore(mask, node);
       this.clear();
-      //setTimeout(this.app.uploadMask(mask), 1000);//включить после отладки      
+      setTimeout(this.app.uploadMask(mask), 1000);//включить после отладки      
     }
   }
 

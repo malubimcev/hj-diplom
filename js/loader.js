@@ -12,6 +12,7 @@ export default class FileLoader {
       method: 'POST'
     })
       .then(res => {
+        console.log(res.status);
         if (200 <= res.status && res.status < 300) {
           return res.json();
         }
