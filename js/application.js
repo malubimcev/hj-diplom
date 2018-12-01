@@ -173,8 +173,8 @@ export default class Application {
     mask.width = this.currentImage.width;
     mask.height = this.currentImage.height;
     mask.style.zIndex = this.currentImage.style.zIndex + 1;
+    mask.addEventListener('load', this.currentImage.appendChild(mask));
     mask.src = url;
-    this.currentImage.appendChild(mask);
   }
 
   loadImage() {
