@@ -17,18 +17,23 @@ export default class WSConnection {
   }
 
   onMessage(event) {
+    console.log(`ws.event.data=${event.data}`);
     try {
       const msg = event.data;
-      console.log(msg['event']);
       switch(msg['event']) {
         case 'pic':
+          console.log(`msg.pic.title=${msg.pic}`);
           this.app.loadImage();
           break;
         case 'comment':
           this.app.addComment(msg.comment);
           break;
         case 'mask':
+          console.log(`msg.mask=${msg.mask}`);
           this.app.addMask(msg.mask);
+          break;
+        case 'error':
+          console.log(`ws error: ${msg.message}`);
           break;
       }
     } catch (err) {
@@ -40,4 +45,4 @@ export default class WSConnection {
     this.ws.send(msg);
   }
 
-}
+}//end class

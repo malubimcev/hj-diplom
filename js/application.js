@@ -163,10 +163,7 @@ export default class Application {
   }
 
   uploadMask(img) {
-    const msg = {
-      'url': img.src
-    }
-    this.connection.send(msg);
+    this.connection.send(img);
   }
 
   addMask(maskSrc) {

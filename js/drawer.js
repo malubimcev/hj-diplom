@@ -36,23 +36,19 @@ export default class Drawer {
   }
 
   registerEvents() {
-    const onStopDrawing = debounce(() => {
-      this.newMask();
-    }, 500);
-
-    canvas.addEventListener('mousedown', (evt) => {
+    canvas.addEventListener('mousedown', (event) => {
       if (this.app.currentMode === 'draw') {
         this.drawing = true;
         const line = [];
-        line.push([evt.offsetX, evt.offsetY]);
+        line.push([event.offsetX, event.offsetY]);
         lines.push(line);
         needsRepaint = true;
       }
     });
 
-    canvas.addEventListener('mousemove', (evt) => {
+    canvas.addEventListener('mousemove', (event) => {
       if (this.app.currentMode === 'draw' && this.drawing) {
-        const point = [evt.offsetX, evt.offsetY];
+        const point = [event.offsetX, event.offsetY];
         lines[lines.length - 1].push(point);
         needsRepaint = true;
       }
@@ -71,7 +67,7 @@ export default class Drawer {
       const node = this.app.container.querySelector('.error');
       this.app.container.insertBefore(mask, node);
       this.clear();
-      setTimeout(this.app.uploadMask(mask), 1000);//включить после отладки      
+      setTimeout(canvas.toBlob((blob) => this.app.uploadMask(blob)), 2000);      
     }
   }
 
