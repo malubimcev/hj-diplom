@@ -166,14 +166,14 @@ export default class Application {
     this.connection.send(img);
   }
 
-  addMask(maskSrc) {
+  addMask(url) {
     const mask = this.currentImage.cloneNode();
     mask.style.left = this.currentImage.style.left;
     mask.style.top = this.currentImage.style.top;
     mask.width = this.currentImage.width;
     mask.height = this.currentImage.height;
     mask.style.zIndex = this.currentImage.style.zIndex + 1;
-    mask.src = maskSrc;
+    mask.src = url;
     this.currentImage.appendChild(mask);
   }
 

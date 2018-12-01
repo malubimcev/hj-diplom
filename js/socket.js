@@ -22,15 +22,13 @@ export default class WSConnection {
       const msg = event.data;
       switch(msg['event']) {
         case 'pic':
-          console.log(`msg.pic.title=${msg.pic}`);
           this.app.loadImage();
           break;
         case 'comment':
           this.app.addComment(msg.comment);
           break;
         case 'mask':
-          console.log(`msg.mask=${msg.mask}`);
-          this.app.addMask(msg.mask);
+          this.app.addMask(msg.url);
           break;
         case 'error':
           console.log(`ws error: ${msg.message}`);
