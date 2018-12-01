@@ -42,9 +42,9 @@ export default class Application {
   }
 
   onPageLoad() {
-    this.imageId = window.location.search;
+    this.imageId = window.location.search.slice(4);
+    console.log(`imageId=${this.imageId}`);
     if (this.imageId) {
-      console.log(this.imageId);
       this.loadImage();
     }
   }
@@ -148,8 +148,11 @@ export default class Application {
   onFileUploaded(data) {
     console.log(data);
     this.updatePage(data);
+    this.currentImage.addEventListener('load', (event) => {
+      this.drawer = new Drawer(this.currentImage, this);
+    });
+    this.currentImage.src = data.url;
     this.imageLoader.style = 'display: none;';
-    this.drawer = new Drawer(this.currentImage, this);
     this.connection = new WSConnection(this);
     this.setShareMode();
   }
@@ -186,7 +189,6 @@ export default class Application {
 
   updatePage(data) {
     this.imageId = data.id;
-    this.currentImage.src = data.url;
     if (data.mask) {
       this.addMask(data.mask);
     }
@@ -195,10 +197,10 @@ export default class Application {
     }
   }
 
-  getLink(id) {
-    const loader = new FileLoader();
-    loader.loadData('/pic/' + this.imageId)
-      .then(data => this.page = data);
-  }
+  // getLink(id) {
+  //   const loader = new FileLoader();
+  //   loader.loadData('/pic/' + this.imageId)
+  //     .then(data => this.page = data);
+  // }
 
 }
