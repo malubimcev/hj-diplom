@@ -92,6 +92,11 @@ export default class Menu {
     this.burger.style = 'display: inline-block;';
   }
 
+  setShareState() {
+    this.resetState();
+    this.menu.querySelector('.mode.share').dataset.state = 'selected';
+  }
+
   setState(event) {
     const item = event.target.classList.contains('menu__item') ? event.target : event.target.parentElement;
 

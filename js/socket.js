@@ -19,8 +19,8 @@ export default class WSConnection {
   onMessage(event) {
     try {
       const msg = event.data;
-      console.log(msg.event);
-      switch(msg.event) {
+      console.log(msg['event']);
+      switch(msg['event']) {
         case 'pic':
           this.app.loadImage();
           break;
@@ -34,6 +34,10 @@ export default class WSConnection {
     } catch (err) {
       console.log(`ws message error: ${err.message}`)
     }
+  }
+
+  send(msg) {
+    this.ws.send(msg);
   }
 
 }

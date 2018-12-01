@@ -15,11 +15,13 @@ const colors = {
 let color = colors['green'];
 
 export default class Drawer {
-  constructor(container, app) {
-    this.container = container;
+
+  constructor(image, app) {
+    this.image = image;
     this.app = app;
-    canvas.width = container.offsetWidth;
-    canvas.height = container.offsetHeight;
+
+    canvas.width = this.image.offsetWidth;
+    canvas.height = this.image.offsetHeight;
     canvas.style.left = '50%';
     canvas.style.top = '50%';
     canvas.style.position = 'absolute';
@@ -65,7 +67,7 @@ export default class Drawer {
 
   newMask() {
     if (this.app.currentMode === 'draw') {
-      const mask = createMask(this.container);
+      const mask = createMask(this.image);
       const node = this.app.container.querySelector('.error');
       this.app.container.insertBefore(mask, node);
       this.clear();
@@ -86,7 +88,7 @@ export default class Drawer {
     color = colors[colorName];
   }
 
-}
+}//end class
 
 function createMask(container) {
   const mask = container.cloneNode();
@@ -152,5 +154,3 @@ function tick () {
   }
   window.requestAnimationFrame(tick);
 }
-
-// tick();

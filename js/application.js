@@ -29,20 +29,24 @@ export default class Application {
     this.connection = null;
 
     this.registerEvents();
-    //this.setCommentMode('on');
-    this.setPublicationMode();//включить после отладки
-    // this.drawer = new Drawer(this.currentImage, this);//отладка, удалить
-    // this.setShareMode();//отладка, удалить
+    this.setPublicationMode();
   }
 
   registerEvents() {
+    document.addEventListener('DOMContentLoaded', this.onPageLoad.bind(this), false);
+
     ['dragenter', 'dragover', 'drop'].forEach(eventName => {
       this.container.addEventListener(eventName, event => event.preventDefault(), false);
     });
-    this.container.addEventListener('dragstart', () => {
-
-    }, false);
     this.container.addEventListener('drop', this.onDrop.bind(this), false);
+  }
+
+  onPageLoad() {
+    this.imageId = window.location.search;
+    if (this.imageId) {
+      console.log(this.imageId);
+      this.loadImage();
+    }
   }
 
   resetModes() {
@@ -65,6 +69,7 @@ export default class Application {
     const id = this.imageId ? ('?id=' + this.imageId) : '';
     this.menu.linkField.value = this.page + id;
     this.menu.setEditState();
+    this.menu.setShareState();
   }
 
   setCommentMode(mode) {
@@ -131,16 +136,18 @@ export default class Application {
   onDrop(event) {
     const file = event.dataTransfer.files[0];
     const fileType = /^image\//;
-    if (file && file.type.match(fileType)) {
-      this.uploadFile(file);
-    } else {
-      this.setErrorMode(this.fileTypeErrorMessage);
+    if (this.currentMode !== 'draw') {
+      if (file && file.type.match(fileType)) {
+        this.uploadFile(file);
+      } else {
+        this.setErrorMode(this.fileTypeErrorMessage);
+      }
     }
   }
   
   onFileUploaded(data) {
-    this.currentImage.src = data.url;
-    this.imageId = data.id;
+    console.log(data);
+    this.updatePage(data);
     this.imageLoader.style = 'display: none;';
     this.drawer = new Drawer(this.currentImage, this);
     this.connection = new WSConnection(this);
@@ -154,7 +161,10 @@ export default class Application {
   }
 
   uploadMask(img) {
-    this.connection.send(img);
+    const msg = {
+      'url': img.src
+    }
+    this.connection.send(msg);
   }
 
   addMask(maskSrc) {
@@ -183,7 +193,6 @@ export default class Application {
     if (data.comments) {
       data.comments.forEach(this.addComment);
     }
-    this.setShareMode();
   }
 
   getLink(id) {
