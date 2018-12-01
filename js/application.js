@@ -43,7 +43,6 @@ export default class Application {
 
   onPageLoad() {
     this.imageId = window.location.search.slice(4);
-    console.log(`imageId=${this.imageId}`);
     if (this.imageId) {
       this.loadImage();
     }
@@ -184,7 +183,7 @@ export default class Application {
   loadImage() {
     const loader = new FileLoader(this);
     loader.loadData('/pic/' + this.imageId)
-      .then(this.updatePage.bind(this));
+      .then(this.onFileUploaded.bind(this));
   }
 
   updatePage(data) {
@@ -196,11 +195,5 @@ export default class Application {
       data.comments.forEach(this.addComment);
     }
   }
-
-  // getLink(id) {
-  //   const loader = new FileLoader();
-  //   loader.loadData('/pic/' + this.imageId)
-  //     .then(data => this.page = data);
-  // }
 
 }
