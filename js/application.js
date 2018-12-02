@@ -22,7 +22,7 @@ export default class Application {
     this.error = container.querySelector('.error');
     this.errorMessage = container.querySelector('.error__message');
     this.fileTypeErrorMessage = 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.';
-    this.fileLoadErrorMessage = 'Чтобы загрузить новое изображение, пожалуйста, воспользуйтесь пунктом "Загрузить новое" в меню.';
+    this.fileDropErrorMessage = 'Чтобы загрузить новое изображение, пожалуйста, воспользуйтесь пунктом "Загрузить новое" в меню.';
 
     this.menu = new Menu(container.querySelector('.menu'), this);
     this.drawer = null;
@@ -31,6 +31,7 @@ export default class Application {
 
     this.registerEvents();
     this.setPublicationMode();
+    // this.setCommentMode('on');//режим отладки
   }
 
   registerEvents() {
@@ -46,7 +47,7 @@ export default class Application {
     this.imageId = window.location.search.slice(4);
     if (this.imageId) {
       this.loadImage();
-      this.setCommentMode();
+      this.setCommentMode('on');
     }
   }
 
@@ -80,6 +81,8 @@ export default class Application {
     for (const marker of markers) {
       marker.style = display;
     }
+    this.menu.setEditState();
+    this.menu.setCommentState();
   }
 
   addCommentBoard(event) {
@@ -133,6 +136,8 @@ export default class Application {
       } else {
         this.setErrorMode(this.fileTypeErrorMessage);
       }
+    } else {
+      this.setErrorMode(this.fileDropErrorMessage);
     }
   }
   

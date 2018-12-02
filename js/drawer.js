@@ -68,8 +68,8 @@ export default class Drawer {
 
       mask.addEventListener('load', () => {
         this.app.container.insertBefore(mask, node);
-        this.clear();
         canvas.toBlob(blob => this.app.uploadMask(blob));
+        this.clear();
       });
       mask.src = canvas.toDataURL();
     }
