@@ -1,5 +1,7 @@
 'use strict';
 
+const SEND_DELAY = 1000;//задержка отправки маск
+
 export default class WSConnection {
   constructor(app) {
     this.app = app;
@@ -17,7 +19,7 @@ export default class WSConnection {
   }
 
   onMessage(event) {
-    console.log(`ws.event.data=${event.data}`);
+    // console.log(`ws.event.data=${event.data}`);
     try {
       const msg = JSON.parse(event.data);
       switch(msg.event) {
@@ -35,12 +37,12 @@ export default class WSConnection {
           break;
       }
     } catch (err) {
-      console.log(`ws message error: ${err.message}`)
+      console.log(`ws error: ${err.message}`)
     }
   }
 
   send(msg) {
-    this.ws.send(msg);
+    setTimeout(() => this.ws.send(msg), SEND_DELAY);
   }
 
 }//end class

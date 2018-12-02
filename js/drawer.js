@@ -1,6 +1,5 @@
 'use strict';
 
-const SEND_DELAY = 1000;//задержка отправки маски
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
 const BRUSH_RADIUS = 4;
@@ -66,9 +65,13 @@ export default class Drawer {
     if (this.app.currentMode === 'draw') {
       const mask = createMask(this.image);
       const node = this.app.container.querySelector('.error');
-      this.app.container.insertBefore(mask, node);
-      this.clear();
-      setTimeout(canvas.toBlob((blob) => this.app.uploadMask(blob)), SEND_DELAY);      
+
+      mask.addEventListener('load', () => {
+        this.app.container.insertBefore(mask, node);
+        this.clear();
+        canvas.toBlob(blob => this.app.uploadMask(blob));
+      });
+      mask.src = canvas.toDataURL();
     }
   }
 
@@ -95,7 +98,6 @@ function createMask(container) {
   mask.height = canvas.height;
   mask.style.zIndex = container.style.zIndex + 1;
   canvas.style.zIndex = mask.style.zIndex + 1;
-  mask.src = canvas.toDataURL();
   return mask;
 };
 

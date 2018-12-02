@@ -124,17 +124,6 @@ export default class Application {
     fileInput.click();
   }
 
-  uploadFile(file) {
-    this.isUpdated = false;
-    this.imageLoader.style = 'display: block;';
-    this.error.style = 'display: none;';
-    const formData = new FormData();
-    formData.append('title', file.name);
-    formData.append('image', file, file.name);
-    const loader = new FileLoader(this);
-    loader.upload(formData, '/pic', this.onFileUploaded.bind(this));
-  }
-
   onDrop(event) {
     const file = event.dataTransfer.files[0];
     const fileType = /^image\//;
@@ -147,8 +136,18 @@ export default class Application {
     }
   }
   
+  uploadFile(file) {
+    this.isUpdated = false;
+    this.imageLoader.style = 'display: block;';
+    this.error.style = 'display: none;';
+    const formData = new FormData();
+    formData.append('title', file.name);
+    formData.append('image', file, file.name);
+    const loader = new FileLoader(this);
+    loader.upload(formData, '/pic', this.onFileUploaded.bind(this));
+  }
+
   onFileUploaded(data) {
-    console.log(data);
     this.updatePage(data);
     this.currentImage.addEventListener('load', (event) => {
       this.drawer = new Drawer(this.currentImage, this);
@@ -170,7 +169,6 @@ export default class Application {
   }
 
   addMask(url) {
-    console.log(`addMask url=${url}`);
     const mask = this.currentImage.cloneNode();
     mask.style.left = this.currentImage.style.left;
     mask.style.top = this.currentImage.style.top;
