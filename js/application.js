@@ -15,6 +15,7 @@ export default class Application {
     this.imageId = '';
     this.currentColor = 'green';
     this.page = 'https://netology-code.github.io/hj-26-malubimcev/';
+    this.isUpdated = false;
 
     this.commentsForm = container.querySelector('.comments__form');
     
@@ -45,6 +46,7 @@ export default class Application {
     this.imageId = window.location.search.slice(4);
     if (this.imageId) {
       this.loadImage();
+      this.setCommentMode();
     }
   }
 
@@ -123,6 +125,7 @@ export default class Application {
   }
 
   uploadFile(file) {
+    this.isUpdated = false;
     this.imageLoader.style = 'display: block;';
     this.error.style = 'display: none;';
     const formData = new FormData();
@@ -135,7 +138,7 @@ export default class Application {
   onDrop(event) {
     const file = event.dataTransfer.files[0];
     const fileType = /^image\//;
-    if (this.currentMode !== 'draw') {
+    if (this.currentMode === 'publication') {
       if (file && file.type.match(fileType)) {
         this.uploadFile(file);
       } else {
@@ -167,6 +170,7 @@ export default class Application {
   }
 
   addMask(url) {
+    console.log(`addMask url=${url}`);
     const mask = this.currentImage.cloneNode();
     mask.style.left = this.currentImage.style.left;
     mask.style.top = this.currentImage.style.top;
@@ -178,9 +182,14 @@ export default class Application {
   }
 
   loadImage() {
-    const loader = new FileLoader(this);
-    loader.loadData('/pic/' + this.imageId)
-      .then(this.onFileUploaded.bind(this));
+    if (!this.isUpdated) {
+      const loader = new FileLoader(this);
+      loader.loadData('/pic/' + this.imageId)
+        .then(Data => {
+          this.onFileUploaded.bind(this);
+          this.isUpdated = true;
+        });
+    }
   }
 
   updatePage(data) {

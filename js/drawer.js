@@ -1,5 +1,6 @@
 'use strict';
 
+const SEND_DELAY = 1000;//задержка отправки маски
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
 const BRUSH_RADIUS = 4;
@@ -67,7 +68,7 @@ export default class Drawer {
       const node = this.app.container.querySelector('.error');
       this.app.container.insertBefore(mask, node);
       this.clear();
-      setTimeout(canvas.toBlob((blob) => this.app.uploadMask(blob)), 2000);      
+      setTimeout(canvas.toBlob((blob) => this.app.uploadMask(blob)), SEND_DELAY);      
     }
   }
 

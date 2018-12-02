@@ -19,8 +19,8 @@ export default class WSConnection {
   onMessage(event) {
     console.log(`ws.event.data=${event.data}`);
     try {
-      const msg = event.data;
-      switch(msg['event']) {
+      const msg = JSON.parse(event.data);
+      switch(msg.event) {
         case 'pic':
           this.app.loadImage();
           break;
