@@ -66,14 +66,19 @@ export default class Application {
   }
 
   setCommentMode(mode) {
-    const display = mode === 'on' ? 'visibility: visible;' : 'visibility: hidden;';
+    const display = mode === 'on' ? 'visibility: visible; z-index: 2;' : 'visibility: hidden; z-index: 0;';
     const markers = this.container.querySelectorAll('.comments__marker');
     const bodys = this.container.querySelectorAll('.comments__body');
+    const inputs = this.container.querySelectorAll('.comments__marker-checkbox');
     for (const marker of markers) {
       marker.style = display;
     }
     for (const body of bodys) {
       body.style = display;
+    }
+    for (const inp of inputs) {
+      inp.style = display;
+      inp.style.zIndex = 999;
     }
     this.menu.setEditState();
     this.menu.setCommentState();
@@ -93,7 +98,7 @@ export default class Application {
     const elem = document.elementFromPoint(commentObj.left, commentObj.top);
     console.log(elem.className);
     const comment = createComment(commentObj);
-    elem.appendChild(comment);
+    elem.parentElement.insertBefore(comment, elem);
   }
 
   setDrawMode() {
@@ -196,7 +201,9 @@ export default class Application {
       this.addMask(data.mask);
     }
     if (data.comments) {
-      data.comments.forEach(this.addComment);
+      for (const comment in data.comments) {
+        this.addComment(comment);
+      }
     }
   }
 

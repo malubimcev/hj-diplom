@@ -98,14 +98,14 @@ export default class CommentBoard {
   sendComment(event) {
   	event.preventDefault();
     const formData = new FormData(this.board);
-    formData.append('left', this.body.style.left);
-    formData.append('top', this.body.style.top);
+    formData.append('left', this.commentInput.style.left);
+    formData.append('top', this.commentInput.style.top);
     formData.append('message', this.commentInput.textContent);
 
     const loader = new FileLoader(this.app);
     const url = '/pic/' + this.app.imageId + '/comments';
     this.commentLoader.classList.add('loader');
-    
+
     loader.upload(formData, url, (data) => {
     	this.commentLoader.classList.remove('loader');
     	this.app.updatePage(data);

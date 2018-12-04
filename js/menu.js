@@ -146,7 +146,7 @@ export default class Menu {
         this.app.setShareMode();
       }
       if (item.classList.contains('comments')) {
-        this.app.setCommentMode();
+        this.app.setCommentMode('on');
       }
     }
   }
