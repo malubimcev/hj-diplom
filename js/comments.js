@@ -101,10 +101,11 @@ export default class CommentBoard {
     formData.append('left', this.body.style.left);
     formData.append('top', this.body.style.top);
     formData.append('message', this.commentInput.textContent);
-    console.log(formData['top']);//*****************************************************************
+
     const loader = new FileLoader(this.app);
     const url = '/pic/' + this.app.imageId + '/comments';
     this.commentLoader.classList.add('loader');
+    
     loader.upload(formData, url, (data) => {
     	this.commentLoader.classList.remove('loader');
     	this.app.updatePage(data);

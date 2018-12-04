@@ -81,8 +81,8 @@ export default class Application {
   }
 
   addCommentBoard(event) {
-    const left = parseInt(event.pageX);
-    const top = parseInt(event.pageY);
+    const left = event.pageX;
+    const top = event.pageY;
     const commentBoard = new CommentBoard(null, this);
     commentBoard.board.style.left = `${left}px`;
     commentBoard.board.style.top = `${top}px`;

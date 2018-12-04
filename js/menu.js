@@ -98,7 +98,7 @@ export default class Menu {
   }
 
   setCommentState() {
-    //this.resetState();
+    this.resetState();
     this.menu.querySelector('.mode.comments').dataset.state = 'selected';
   }
 
