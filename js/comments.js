@@ -53,7 +53,7 @@ function createBoard() {
   return form;
 }
 
-function createComment(commentInfo) {
+export function createComment(commentInfo) {
   const time = document.createElement('p');
   time.classList.add('comment__time');
   time.textContent = commentInfo.timestamp;
@@ -97,11 +97,12 @@ export default class CommentBoard {
 
   sendComment(event) {
   	event.preventDefault();
-    let formData = new FormData(this.board);
-    formData.append('left', this.board.style.left);
-    formData.append('top', this.board.style.top);
+    const formData = new FormData(this.board);
+    formData.append('left', this.body.style.left);
+    formData.append('top', this.body.style.top);
     formData.append('message', this.commentInput.textContent);
-    const loader = new FileLoader();
+    console.log(formData['message']);//*****************************************************************
+    const loader = new FileLoader(this.app);
     const url = '/pic/' + this.app.imageId + '/comments';
     this.commentLoader.classList.add('loader');
     loader.upload(formData, url, (data) => {
@@ -111,7 +112,7 @@ export default class CommentBoard {
   }
 
   close() {
-    this.body.style = 'display: none;';
+    this.body.style = 'visibility: hidden;';
   }
 
   addComment(commentObj) {

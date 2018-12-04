@@ -4,6 +4,7 @@ import Menu from "./menu.js";
 import FileLoader from "./loader.js";
 import WSConnection from "./socket.js";
 import CommentBoard from "./comments.js";
+import createComment from "./comments.js";
 import Drawer from "./drawer.js";
 
 export default class Application {
@@ -30,8 +31,7 @@ export default class Application {
     this.connection = null;
 
     this.registerEvents();
-    // this.setPublicationMode();//*******************включить после отладки***************
-    this.setTestMode();//режим отладки****************удалить после отладки*****************
+    this.setPublicationMode();
   }
 
   registerEvents() {
@@ -76,7 +76,7 @@ export default class Application {
 
   setCommentMode(mode) {
     this.currentMode = 'comments';
-    const display = mode === 'on' ? 'display: block;' : 'display: none;';
+    const display = mode === 'on' ? 'visibility: visible;' : 'visibility: hidden;';
     const markers = this.container.querySelectorAll('.comments__marker');
     const bodys = this.container.querySelectorAll('.comments__body');
     for (const marker of markers) {
@@ -89,22 +89,6 @@ export default class Application {
     this.menu.setCommentState();
   }
 
-  setTestMode() {//*******************удалить после отладки*********************************************
-    const data = {
-      "id": "aba23fc0-1008-11e8-b8b2-2b0fbff0de7d",
-      "title": "Макет дизайна",
-      "url": "https://storage.googleapis.com/neto-api.appspot.com/pic/aba23fc0-1008-11e8-b8b2-2b0fbff0de7d/bMFAlDwf9AI.jpg",
-      "timestamp": 1518449006013      
-    };
-    this.updatePage(data);
-    this.currentImage.addEventListener('load', (event) => {
-      this.drawer = new Drawer(this.currentImage, this);
-    });
-    this.currentImage.src = data.url;
-    this.imageLoader.style = 'display: none;';
-    this.setCommentMode('on');
-  }//***************************************************************************************************
-
   addCommentBoard(event) {
     const left = parseInt(event.pageX);
     const top = parseInt(event.pageY);
@@ -115,7 +99,10 @@ export default class Application {
   }
 
   addComment(commentObj) {
-    //
+    const elem = document.elementFromPoint(commentObj.left, commentObj.top);
+    console.log(elem.className);
+    const comment = createComment(commentObj);
+    elem.appendChild(comment);
   }
 
   setDrawMode() {
@@ -181,9 +168,9 @@ export default class Application {
   }
 
   onClick(event) {
-    //if (this.currentMode === 'comments') {//********************включить после отладки*****************
+    if (this.currentMode === 'comments') {
       this.addCommentBoard(event);
-    //}
+    }
   }
 
   uploadMask(img) {
