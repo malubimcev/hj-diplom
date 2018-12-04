@@ -51,31 +51,21 @@ export default class Application {
     }
   }
 
-  resetModes() {
-    this.imageLoader.style = 'display: none;';
-    this.error.style = 'display: none;';
-    if (this.drawer) {
-      this.drawer.removeCanvas();
-      this.drawer = null;
-    }
-  }
-
   setPublicationMode() {
-    this.currentMode = 'publication';
     this.currentImage.src = '';
     this.menu.setPublicationState();
+    this.currentMode = 'publication';
   }
 
   setShareMode() {
-    this.currentMode = 'share';
     const id = this.imageId ? ('?id=' + this.imageId) : '';
     this.menu.linkField.value = this.page + id;
     this.menu.setEditState();
     this.menu.setShareState();
+    this.currentMode = 'share';
   }
 
   setCommentMode(mode) {
-    this.currentMode = 'comments';
     const display = mode === 'on' ? 'visibility: visible;' : 'visibility: hidden;';
     const markers = this.container.querySelectorAll('.comments__marker');
     const bodys = this.container.querySelectorAll('.comments__body');
@@ -87,6 +77,7 @@ export default class Application {
     }
     this.menu.setEditState();
     this.menu.setCommentState();
+    this.currentMode = 'comments';
   }
 
   addCommentBoard(event) {
