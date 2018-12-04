@@ -19,7 +19,7 @@ export default class WSConnection {
   }
 
   onMessage(event) {
-    // console.log(`ws.event.data=${event.data}`);
+    console.log(`ws.event.data=${event.data}`);
     try {
       const msg = JSON.parse(event.data);
       switch(msg.event) {

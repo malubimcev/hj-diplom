@@ -30,8 +30,8 @@ export default class Application {
     this.connection = null;
 
     this.registerEvents();
-    this.setPublicationMode();
-    // this.setCommentMode('on');//режим отладки
+    // this.setPublicationMode();//*******************включить после отладки***************
+    this.setTestMode();//режим отладки****************удалить после отладки*****************
   }
 
   registerEvents() {
@@ -77,24 +77,41 @@ export default class Application {
   setCommentMode(mode) {
     this.currentMode = 'comments';
     const display = mode === 'on' ? 'display: block;' : 'display: none;';
-    const markers = this.container.querySelectorAll('.comments__form');
+    const markers = this.container.querySelectorAll('.comments__marker');
+    const bodys = this.container.querySelectorAll('.comments__body');
     for (const marker of markers) {
       marker.style = display;
+    }
+    for (const body of bodys) {
+      body.style = display;
     }
     this.menu.setEditState();
     this.menu.setCommentState();
   }
 
+  setTestMode() {//*******************удалить после отладки*********************************************
+    const data = {
+      "id": "aba23fc0-1008-11e8-b8b2-2b0fbff0de7d",
+      "title": "Макет дизайна",
+      "url": "https://storage.googleapis.com/neto-api.appspot.com/pic/aba23fc0-1008-11e8-b8b2-2b0fbff0de7d/bMFAlDwf9AI.jpg",
+      "timestamp": 1518449006013      
+    };
+    this.updatePage(data);
+    this.currentImage.addEventListener('load', (event) => {
+      this.drawer = new Drawer(this.currentImage, this);
+    });
+    this.currentImage.src = data.url;
+    this.imageLoader.style = 'display: none;';
+    this.setCommentMode('on');
+  }//***************************************************************************************************
+
   addCommentBoard(event) {
-    // const left = parseInt(event.currentTarget.style.left) - this.currentImage.getBoundingClientRect().x;
-    // const top = parseInt(event.currentTarget.style.top) - this.currentImage.getBoundingClientRect().y;
-    const left = event.layerX;
-    const top = event.layerY;
+    const left = parseInt(event.pageX);
+    const top = parseInt(event.pageY);
     const commentBoard = new CommentBoard(null, this);
-    commentBoard.board.style.left = left;
-    commentBoard.board.style.top = top;
+    commentBoard.board.style.left = `${left}px`;
+    commentBoard.board.style.top = `${top}px`;
     this.container.appendChild(commentBoard.board);
-    //commentBoard.board.style = 'display: block;';
   }
 
   addComment(commentObj) {
@@ -164,9 +181,9 @@ export default class Application {
   }
 
   onClick(event) {
-    if (this.currentMode === 'comments') {
+    //if (this.currentMode === 'comments') {//********************включить после отладки*****************
       this.addCommentBoard(event);
-    }
+    //}
   }
 
   uploadMask(img) {
