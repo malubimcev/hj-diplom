@@ -59,7 +59,6 @@ export default class Menu {
         this.draggedMenu = null;
       }
     });
-
   }
 
   changeCommentMode() {

@@ -101,16 +101,6 @@ function createMask(container) {
   return mask;
 };
 
-function debounce(callback,  delay) {
-  return () => {
-    clearTimeout(timeout);
-    timeout = setTimeout(function() {
-      timeout = null;
-      callback();
-    }, delay);
-  };
-};
-
 function circle(point) {
   ctx.beginPath();
   ctx.arc(...point, BRUSH_RADIUS / 2, 0, 2 * Math.PI);

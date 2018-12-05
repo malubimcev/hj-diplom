@@ -7,6 +7,9 @@ import CommentBoard from "./comments.js";
 import createComment from "./comments.js";
 import Drawer from "./drawer.js";
 
+const FILE_TYPE_ERROR_MESSAGE = 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.';
+const DROP_ERROR_MESSAGE = 'Чтобы загрузить новое изображение, пожалуйста, воспользуйтесь пунктом "Загрузить новое" в меню.';
+
 export default class Application {
   constructor(container) {
     this.container = container;
@@ -22,8 +25,6 @@ export default class Application {
     
     this.error = container.querySelector('.error');
     this.errorMessage = container.querySelector('.error__message');
-    this.fileTypeErrorMessage = 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.';
-    this.fileDropErrorMessage = 'Чтобы загрузить новое изображение, пожалуйста, воспользуйтесь пунктом "Загрузить новое" в меню.';
 
     this.menu = new Menu(container.querySelector('.menu'), this);
     this.drawer = null;
@@ -66,7 +67,7 @@ export default class Application {
   }
 
   setCommentMode(mode) {
-    const display = mode === 'on' ? 'visibility: visible; z-index: 2;' : 'visibility: hidden; z-index: 0;';
+    const display = mode === 'on' ? 'visibility: visible; z-index: 999;' : 'visibility: hidden; z-index: 0;';
     const markers = this.container.querySelectorAll('.comments__marker');
     const bodys = this.container.querySelectorAll('.comments__body');
     const inputs = this.container.querySelectorAll('.comments__marker-checkbox');
@@ -78,7 +79,7 @@ export default class Application {
     }
     for (const inp of inputs) {
       inp.style = display;
-      inp.style.zIndex = 999;
+      inp.style.zIndex = 9999;
     }
     this.menu.setEditState();
     this.menu.setCommentState();
@@ -134,10 +135,10 @@ export default class Application {
       if (file && file.type.match(fileType)) {
         this.uploadFile(file);
       } else {
-        this.setErrorMode(this.fileTypeErrorMessage);
+        this.setErrorMode(FILE_TYPE_ERROR_MESSAGE);
       }
     } else {
-      this.setErrorMode(this.fileDropErrorMessage);
+      this.setErrorMode(DROP_ERROR_MESSAGE);
     }
   }
   
