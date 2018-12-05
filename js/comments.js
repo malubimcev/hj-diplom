@@ -106,14 +106,14 @@ export default class CommentBoard {
     const url = '/pic/' + this.app.imageId + '/comments';
     this.commentLoader.classList.add('loader');
 
-    loader.upload(formData, url, (data) => {
+    loader.sendForm(formData, url, (data) => {
     	this.commentLoader.classList.remove('loader');
     	this.app.updatePage(data);
     });
   }
 
   close() {
-    this.body.style = 'visibility: hidden;';
+    this.body.style = 'display: none;';
   }
 
   addComment(commentObj) {
