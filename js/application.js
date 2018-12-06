@@ -97,7 +97,7 @@ export default class Application {
 
   addComment(commentObj) {
     const elem = document.elementFromPoint(commentObj.left, commentObj.top);
-    console.log(elem.className);
+    // console.log(elem.className);
     const comment = createComment(commentObj);
     elem.parentElement.insertBefore(comment, elem);
   }
