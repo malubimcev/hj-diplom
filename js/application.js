@@ -189,8 +189,8 @@ export default class Application {
     if (!this.isUpdated) {
       const loader = new FileLoader(this);
       loader.loadData('/pic/' + this.imageId)
-        .then(Data => {
-          this.onFileUploaded.bind(this);
+        .then(data => {
+          this.onFileUploaded(data);
           this.isUpdated = true;
         });
     }
