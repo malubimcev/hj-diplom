@@ -26,6 +26,7 @@ export default class WSConnection {
           this.app.loadImage();
           break;
         case 'comment':
+          console.log(`ws.comment: ${msg.comment}`);
           this.app.addComment(msg.comment);
           break;
         case 'mask':

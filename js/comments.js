@@ -69,6 +69,7 @@ export function createComment(commentInfo) {
   comment.appendChild(message);
   comment.style.left = commentInfo.left;
   comment.style.top = commentInfo.top;
+  console.log(`createComment finished: ${commentInfo.left}/${commentInfo.top}`);
 
   return comment;
 }
@@ -115,7 +116,6 @@ export class CommentBoard {
 
     loader.sendForm(requestString, url, (data) => {
     	this.commentLoader.classList.remove('loader');
-    	//this.app.updatePage(data);
     });
   }
 

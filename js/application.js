@@ -87,17 +87,18 @@ export default class Application {
   }
 
   addCommentBoard(event) {
-    const left = event.pageX;
-    const top = event.pageY;
     const commentBoard = new CommentBoard(null, this);
-    commentBoard.board.style.left = `${left}px`;
-    commentBoard.board.style.top = `${top}px`;
+    commentBoard.board.style.left = `${event.pageX}px`;
+    commentBoard.board.style.top = `${event.pageY}px`;
   }
 
   addComment(commentObj) {
     const elem = document.elementFromPoint(commentObj.left, commentObj.top);
     const comment = createComment(commentObj);
-    elem.parentElement.insertBefore(comment, elem);
+    if (elem.className === 'comments__body') {
+      const refNode = elem.querySelector('.loader');
+      elem.insertBefore(comment, refNode.parentElement);
+    }
   }
 
   setDrawMode() {
@@ -199,13 +200,9 @@ export default class Application {
     if (data.mask) {
       this.addMask(data.mask);
     }
-    // console.log(`data=${JSON.stringify(data)}`);
     if (data.comments) {
-      // console.log(`data.comments=${JSON.stringify(data.comments)}`);
       for (const key in data.comments) {
-        const comment = data.comments[key];
-        // console.log(`comment=${JSON.stringify(comment)}`);
-        this.addComment(comment);
+        this.addComment(data.comments[key]);
       }
     }
   }
