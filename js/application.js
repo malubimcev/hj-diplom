@@ -3,8 +3,8 @@
 import Menu from "./menu.js";
 import FileLoader from "./loader.js";
 import WSConnection from "./socket.js";
-import CommentBoard from "./comments.js";
-import createComment from "./comments.js";
+import {CommentBoard} from "./comments.js";
+import {createComment} from "./comments.js";
 import Drawer from "./drawer.js";
 
 const FILE_TYPE_ERROR_MESSAGE = 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.';
@@ -92,12 +92,10 @@ export default class Application {
     const commentBoard = new CommentBoard(null, this);
     commentBoard.board.style.left = `${left}px`;
     commentBoard.board.style.top = `${top}px`;
-    this.container.appendChild(commentBoard.board);
   }
 
   addComment(commentObj) {
     const elem = document.elementFromPoint(commentObj.left, commentObj.top);
-    // console.log(elem.className);
     const comment = createComment(commentObj);
     elem.parentElement.insertBefore(comment, elem);
   }
@@ -201,8 +199,12 @@ export default class Application {
     if (data.mask) {
       this.addMask(data.mask);
     }
+    // console.log(`data=${JSON.stringify(data)}`);
     if (data.comments) {
-      for (const comment in data.comments) {
+      // console.log(`data.comments=${JSON.stringify(data.comments)}`);
+      for (const key in data.comments) {
+        const comment = data.comments[key];
+        // console.log(`comment=${JSON.stringify(comment)}`);
         this.addComment(comment);
       }
     }

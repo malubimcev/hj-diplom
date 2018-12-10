@@ -12,7 +12,6 @@ export default class WSConnection {
 
   registerEvents() {
     this.ws.addEventListener('message', this.onMessage.bind(this));
-    // this.ws.addEventListener('open', () => console.log('ws connected'));
     this.ws.addEventListener('close', () => console.log('ws closed'));
     this.ws.addEventListener('error', (err) => console.log(`ws error: ${error.data}`));
     window.addEventListener('beforeUnload', () => this.ws.close(1000));

@@ -73,7 +73,7 @@ export function createComment(commentInfo) {
   return comment;
 }
 
-export default class CommentBoard {
+export class CommentBoard {
   constructor(container, app) {
     if (container) {
       this.board = container;
@@ -81,6 +81,7 @@ export default class CommentBoard {
       this.board = createBoard();
     }
     this.app = app;
+    this.app.container.appendChild(this.board);
     this.addButton = this.board.querySelector('.comments__submit');
     this.closeButton = this.board.querySelector('.comments__close');
     this.commentInput = this.board.querySelector('.comments__input');
@@ -97,18 +98,24 @@ export default class CommentBoard {
 
   sendComment(event) {
   	event.preventDefault();
-    const formData = new FormData(this.board);
-    formData.append('left', this.commentInput.style.left);
-    formData.append('top', this.commentInput.style.top);
-    formData.append('message', this.commentInput.textContent);
+    const commentInfoObj = {
+    	'left': parseInt(this.board.style.left),
+    	'top': parseInt(this.board.style.top),
+    	'message': this.commentInput.value
+    }
+    let props = [];
+    for (const key in commentInfoObj) {
+    	props.push(key + '=' + commentInfoObj[key]);
+    }
+    const requestString = props.join('&');
 
     const loader = new FileLoader(this.app);
     const url = '/pic/' + this.app.imageId + '/comments';
     this.commentLoader.classList.add('loader');
 
-    loader.sendForm(formData, url, (data) => {
+    loader.sendForm(requestString, url, (data) => {
     	this.commentLoader.classList.remove('loader');
-    	this.app.updatePage(data);
+    	//this.app.updatePage(data);
     });
   }
 
