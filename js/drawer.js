@@ -65,8 +65,7 @@ export default class Drawer {
 
       mask.addEventListener('load', () => {
         this.app.container.insertBefore(mask, node);
-        // canvas.toBlob(blob => this.app.uploadMask(blob));
-        this.app.uploadMask(mask);
+        canvas.toBlob(blob => this.app.uploadMask(blob));
         this.clear();
       });
       mask.src = canvas.toDataURL();
@@ -95,21 +94,16 @@ function createMask(container) {
 };
 
 function draw(point) {
-  const cp = point.map((p, i) => p + (p - prevPoint[i]) / 2);
-  
   ctx.lineWidth = BRUSH_RADIUS;
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
   ctx.strokeStyle = color;
-  ctx.quadraticCurveTo(...point, ...cp);
-  // ctx.lineTo(...point);
+  ctx.lineTo(...point);
   prevPoint = point;
   ctx.stroke();
-  ctx.moveTo(...cp);
+  ctx.moveTo(...point);
 }
 
 function tick() {
   window.requestAnimationFrame(tick);
 }
-
-// tick();
