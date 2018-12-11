@@ -86,19 +86,28 @@ export default class Application {
     this.currentMode = 'comments';
   }
 
-  addCommentBoard(event) {
+  addCommentBoard(coords) {
+    console.log(`addCommentBoard: coords.x=${coords.x}`);
     const commentBoard = new CommentBoard(null, this);
-    commentBoard.board.style.left = `${event.pageX}px`;
-    commentBoard.board.style.top = `${event.pageY}px`;
+    commentBoard.board.style.left = `${coords.x}px`;
+    commentBoard.board.style.top = `${coords.y}px`;
   }
 
   addComment(commentObj) {
-    const elem = document.elementFromPoint(commentObj.left, commentObj.top);
-    const comment = createComment(commentObj);
-    if (elem.className === 'comments__body') {
-      const refNode = elem.querySelector('.loader');
-      elem.insertBefore(comment, refNode.parentElement);
+    console.log(`commentObj.left=${commentObj.left}`);
+    let elem = document.elementFromPoint(commentObj.left, commentObj.top);
+    console.log(`try find form: ${elem.tagName}`);
+
+    if (elem.className !== 'comments__body') {
+      console.log(`new form: ${commentObj.left}`);
+      this.addCommentBoard(commentObj.left, commentObj.top);
+      elem = document.elementFromPoint(commentObj.left, commentObj.top);
+      console.log(`new elem: ${elem.tagName}`);
     }
+
+    const comment = createComment(commentObj);
+    const refNode = elem.querySelector('.loader');
+    elem.insertBefore(comment, refNode.parentElement);
   }
 
   setDrawMode() {
@@ -165,7 +174,10 @@ export default class Application {
 
   onClick(event) {
     if (this.currentMode === 'comments') {
-      this.addCommentBoard(event);
+      this.addCommentBoard({
+        'x': event.pageX,
+        'y': event.pageY
+      });
     }
   }
 

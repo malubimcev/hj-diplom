@@ -21,12 +21,12 @@ export default class WSConnection {
     // console.log(`ws.event.data=${event.data}`);
     try {
       const msg = JSON.parse(event.data);
+      console.log(`ws=${msg.event}`);
       switch(msg.event) {
         case 'pic':
           this.app.loadImage();
           break;
         case 'comment':
-          console.log(`ws.comment: ${msg.comment}`);
           this.app.addComment(msg.comment);
           break;
         case 'mask':

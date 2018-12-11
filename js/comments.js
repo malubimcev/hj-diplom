@@ -104,6 +104,7 @@ export class CommentBoard {
     	'top': parseInt(this.board.style.top),
     	'message': this.commentInput.value
     }
+    this.commentInput.value = '';
     let props = [];
     for (const key in commentInfoObj) {
     	props.push(key + '=' + commentInfoObj[key]);

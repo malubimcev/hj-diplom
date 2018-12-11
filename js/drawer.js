@@ -3,8 +3,7 @@
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
 const BRUSH_RADIUS = 4;
-let needsRepaint = true;
-let lines = [];
+let isDrawing = false;
 const colors = {
   'red': '#EA5D56',
   'yellow': '#F3D135',
@@ -13,6 +12,7 @@ const colors = {
   'purple': '#B36ADE'
 };
 let color = colors['green'];
+let prevPoint = [];
 
 export default class Drawer {
 
@@ -30,32 +30,29 @@ export default class Drawer {
 
     document.querySelector('.app').appendChild(canvas);
     
-    this.drawing = false;
-
     this.registerEvents();
   }
 
   registerEvents() {
     canvas.addEventListener('mousedown', (event) => {
       if (this.app.currentMode === 'draw') {
-        this.drawing = true;
-        const line = [];
-        line.push([event.offsetX, event.offsetY]);
-        lines.push(line);
-        needsRepaint = true;
+        const point = [event.offsetX, event.offsetY];
+        ctx.moveTo(...point);
+        ctx.beginPath();
+        prevPoint = point;
+        isDrawing = true;
       }
     });
 
     canvas.addEventListener('mousemove', (event) => {
-      if (this.app.currentMode === 'draw' && this.drawing) {
+      if (this.app.currentMode === 'draw' && isDrawing) {
         const point = [event.offsetX, event.offsetY];
-        lines[lines.length - 1].push(point);
-        needsRepaint = true;
+        draw(point);
       }
       tick();
     });
 
-    ['mouseup', 'mouseleave'].forEach(evName => canvas.addEventListener(evName, () => this.drawing = false));
+    ['mouseup', 'mouseleave'].forEach(evName => canvas.addEventListener(evName, () => isDrawing = false));
     
     canvas.addEventListener('mouseup', this.newMask.bind(this), false);
     canvas.addEventListener('click', this.app.onClick.bind(this.app), false);
@@ -68,19 +65,15 @@ export default class Drawer {
 
       mask.addEventListener('load', () => {
         this.app.container.insertBefore(mask, node);
-        canvas.toBlob(blob => this.app.uploadMask(blob));
+        // canvas.toBlob(blob => this.app.uploadMask(blob));
+        this.app.uploadMask(mask);
         this.clear();
       });
       mask.src = canvas.toDataURL();
     }
   }
 
-  removeCanvas() {
-    document.querySelector('.app').removeChild(canvas);
-  }
-
   clear() {
-    lines = [];
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
@@ -101,45 +94,22 @@ function createMask(container) {
   return mask;
 };
 
-function circle(point) {
-  ctx.beginPath();
-  ctx.arc(...point, BRUSH_RADIUS / 2, 0, 2 * Math.PI);
-  ctx.fillStyle = color;
-  ctx.fill();
-}
-
-function lineBetween (p1, p2) {
-  ctx.moveTo(...p1);
-  ctx.lineTo(...p2);
-}
-
-function drawLine(points) {
-  ctx.beginPath();
+function draw(point) {
+  const cp = point.map((p, i) => p + (p - prevPoint[i]) / 2);
+  
   ctx.lineWidth = BRUSH_RADIUS;
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
   ctx.strokeStyle = color;
-
-  ctx.moveTo(...points[0]);
-  for(let i = 1; i < points.length - 1; i++) {
-    lineBetween(points[i], points[i + 1]);
-  }
+  ctx.quadraticCurveTo(...point, ...cp);
+  // ctx.lineTo(...point);
+  prevPoint = point;
   ctx.stroke();
+  ctx.moveTo(...cp);
 }
 
-function repaint () {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  lines
-    .forEach((line) => {
-      circle(line[0]);
-      drawLine(line);
-    });
-}
-
-function tick () {
-  if(needsRepaint) {
-    repaint();
-    needsRepaint = false;
-  }
+function tick() {
   window.requestAnimationFrame(tick);
 }
+
+// tick();
