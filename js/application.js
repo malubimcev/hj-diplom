@@ -5,7 +5,8 @@ import FileLoader from "./loader.js";
 import WSConnection from "./socket.js";
 import {CommentBoard} from "./comments.js";
 import {createComment} from "./comments.js";
-import Drawer from "./drawer.js";
+import {Drawer} from "./drawer.js";
+import {createMask} from "./drawer.js";
 
 const FILE_TYPE_ERROR_MESSAGE = 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.';
 const DROP_ERROR_MESSAGE = 'Чтобы загрузить новое изображение, пожалуйста, воспользуйтесь пунктом "Загрузить новое" в меню.';
@@ -87,26 +88,27 @@ export default class Application {
   }
 
   addCommentBoard(coords) {
-    console.log(`addCommentBoard: coords.x=${coords.x}`);
     const commentBoard = new CommentBoard(null, this);
-    commentBoard.board.style.left = `${coords.x}px`;
-    commentBoard.board.style.top = `${coords.y}px`;
+    commentBoard.board.style.left = `${coords.left}px`;
+    commentBoard.board.style.top = `${coords.top}px`;
   }
 
   addComment(commentObj) {
-    console.log(`commentObj.left=${commentObj.left}`);
     let elem = document.elementFromPoint(commentObj.left, commentObj.top);
-    console.log(`try find form: ${elem.tagName}`);
+    console.log(`find form result: ${elem.tagName}`);
 
     if (elem.className !== 'comments__body') {
       console.log(`new form: ${commentObj.left}`);
-      this.addCommentBoard(commentObj.left, commentObj.top);
+      this.addCommentBoard({
+        'left': commentObj.left,
+        'top': commentObj.top
+      });
       elem = document.elementFromPoint(commentObj.left, commentObj.top);
       console.log(`new elem: ${elem.tagName}`);
     }
 
     const comment = createComment(commentObj);
-    const refNode = elem.querySelector('.loader');
+    const refNode = elem.querySelector('.comment div');
     elem.insertBefore(comment, refNode.parentElement);
   }
 
@@ -175,8 +177,8 @@ export default class Application {
   onClick(event) {
     if (this.currentMode === 'comments') {
       this.addCommentBoard({
-        'x': event.pageX,
-        'y': event.pageY
+        'left': event.pageX,
+        'top': event.pageY
       });
     }
   }
@@ -186,12 +188,7 @@ export default class Application {
   }
 
   addMask(url) {
-    const mask = this.currentImage.cloneNode();
-    mask.style.left = this.currentImage.style.left;
-    mask.style.top = this.currentImage.style.top;
-    mask.width = this.currentImage.width;
-    mask.height = this.currentImage.height;
-    mask.style.zIndex = this.currentImage.style.zIndex + 1;
+    const mask = createMask(this.currentImage);
     mask.addEventListener('load', this.currentImage.appendChild(mask));
     mask.src = url;
   }

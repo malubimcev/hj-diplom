@@ -117,20 +117,14 @@ export default class Menu {
 
     if (item.classList.contains('new')) {
       this.app.currentMode = 'publication';
-      if (this.menu.dataset.state === 'initial') {
-        this.app.selectFile();
-        return;
-      }      
-      if (item.dataset.state === 'selected') {
-        this.app.selectFile();
-      }
+      this.app.selectFile();
+      return;
     }
     
     if (item.classList.contains('comments')) {
       this.app.currentMode = 'comments';
       if (item.dataset.state === 'selected') {
         this.changeCommentMode();
-        
       }
     }
 

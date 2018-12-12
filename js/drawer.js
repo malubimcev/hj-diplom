@@ -12,9 +12,8 @@ const colors = {
   'purple': '#B36ADE'
 };
 let color = colors['green'];
-let prevPoint = [];
 
-export default class Drawer {
+export class Drawer {
 
   constructor(image, app) {
     this.image = image;
@@ -37,9 +36,12 @@ export default class Drawer {
     canvas.addEventListener('mousedown', (event) => {
       if (this.app.currentMode === 'draw') {
         const point = [event.offsetX, event.offsetY];
-        ctx.moveTo(...point);
+        ctx.lineWidth = BRUSH_RADIUS;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = color;
+        ctx.moveTo(...point);     
         ctx.beginPath();
-        prevPoint = point;
         isDrawing = true;
       }
     });
@@ -82,7 +84,7 @@ export default class Drawer {
 
 }//end class
 
-function createMask(container) {
+export function createMask(container) {
   const mask = container.cloneNode();
   mask.style.left = canvas.style.left;
   mask.style.top = canvas.style.top;
@@ -94,12 +96,7 @@ function createMask(container) {
 };
 
 function draw(point) {
-  ctx.lineWidth = BRUSH_RADIUS;
-  ctx.lineJoin = 'round';
-  ctx.lineCap = 'round';
-  ctx.strokeStyle = color;
   ctx.lineTo(...point);
-  prevPoint = point;
   ctx.stroke();
   ctx.moveTo(...point);
 }

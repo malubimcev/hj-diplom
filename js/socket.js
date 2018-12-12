@@ -1,6 +1,6 @@
 'use strict';
 
-const SEND_DELAY = 1000;//задержка отправки маск
+const SEND_DELAY = 1000;//задержка отправки сообщения
 
 export default class WSConnection {
   constructor(app) {
@@ -18,7 +18,7 @@ export default class WSConnection {
   }
 
   onMessage(event) {
-    // console.log(`ws.event.data=${event.data}`);
+    console.log(`ws.event.data=${event.data}`);
     try {
       const msg = JSON.parse(event.data);
       console.log(`ws=${msg.event}`);
