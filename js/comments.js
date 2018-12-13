@@ -54,9 +54,10 @@ function createBoard() {
 }
 
 export function createComment(commentInfo) {
-  const time = document.createElement('p');
-  time.classList.add('comment__time');
-  time.textContent = commentInfo.timestamp;
+  const timestamp = document.createElement('p');
+  timestamp.classList.add('comment__time');
+  const date = new Date(commentInfo.timestamp);
+  timestamp.textContent = date.toLocaleString('ru-RU');
 
   const message = document.createElement('p');
   message.classList.add('comment__message');
@@ -65,7 +66,7 @@ export function createComment(commentInfo) {
   const comment = document.createElement('div');
   comment.classList.add('comment');
 
-  comment.appendChild(time);
+  comment.appendChild(timestamp);
   comment.appendChild(message);
   comment.style.left = commentInfo.left;
   comment.style.top = commentInfo.top;
@@ -110,11 +111,11 @@ export class CommentBoard {
     }
     const requestString = props.join('&');
 
-    const loader = new FileLoader(this.app);
+    const fileLoader = new FileLoader(this.app);
     const url = '/pic/' + this.app.imageId + '/comments';
     this.commentLoader.classList.add('loader');
 
-    loader.sendForm(requestString, url, (data) => {
+    fileLoader.sendForm(requestString, url, (data) => {
     	this.commentLoader.classList.remove('loader');
     });
   }

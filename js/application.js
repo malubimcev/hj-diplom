@@ -22,7 +22,8 @@ export default class Application {
     this.page = 'https://netology-code.github.io/hj-26-malubimcev/';
     this.isUpdated = false;
 
-    this.commentsForm = container.querySelector('.comments__form');
+    // this.commentBoards = container.querySelectorAll('.comments__form');
+    // this.commentsPool = new Map();//для хранения форм с комментариями
     
     this.error = container.querySelector('.error');
     this.errorMessage = container.querySelector('.error__message');
@@ -33,7 +34,6 @@ export default class Application {
     this.connection = null;
 
     this.registerEvents();
-    this.setPublicationMode();
   }
 
   registerEvents() {
@@ -49,7 +49,8 @@ export default class Application {
     this.imageId = window.location.search.slice(4);
     if (this.imageId) {
       this.loadImage();
-      this.setCommentMode('on');
+    } else {
+      this.setPublicationMode();
     }
   }
 
@@ -68,20 +69,24 @@ export default class Application {
   }
 
   setCommentMode(mode) {
-    const display = mode === 'on' ? 'visibility: visible; z-index: 999;' : 'visibility: hidden; z-index: 0;';
-    const markers = this.container.querySelectorAll('.comments__marker');
-    const bodys = this.container.querySelectorAll('.comments__body');
-    const inputs = this.container.querySelectorAll('.comments__marker-checkbox');
-    for (const marker of markers) {
-      marker.style = display;
+    const commentsDisplayStyle = mode === 'on' ? 'visibility: visible; z-index: 9999;' : 'visibility: hidden; z-index: 0;';
+    const formElements = this.container.querySelectorAll('.comments__form *');
+    // const markers = this.container.querySelectorAll('.comments__marker');
+    // const bodys = this.container.querySelectorAll('.comments__body');
+    // const inputs = this.container.querySelectorAll('.comments__marker-checkbox');
+    for (const elem of formElements) {
+      elem.style = commentsDisplayStyle;
     }
-    for (const body of bodys) {
-      body.style = display;
-    }
-    for (const inp of inputs) {
-      inp.style = display;
-      inp.style.zIndex = 9999;
-    }
+    // for (const marker of markers) {
+    //   marker.style = display;
+    // }
+    // for (const body of bodys) {
+    //   body.style = display;
+    // }
+    // for (const inp of inputs) {
+    //   inp.style = display;
+    //   // inp.style.zIndex = 9999;
+    // }
     this.menu.setEditState();
     this.menu.setCommentState();
     this.currentMode = 'comments';
@@ -91,20 +96,18 @@ export default class Application {
     const commentBoard = new CommentBoard(null, this);
     commentBoard.board.style.left = `${coords.left}px`;
     commentBoard.board.style.top = `${coords.top}px`;
+    //this.commentsPool.add(commentBoard);
   }
 
   addComment(commentObj) {
     let elem = document.elementFromPoint(commentObj.left, commentObj.top);
-    console.log(`find form result: ${elem.tagName}`);
 
     if (elem.className !== 'comments__body') {
-      console.log(`new form: ${commentObj.left}`);
       this.addCommentBoard({
         'left': commentObj.left,
         'top': commentObj.top
       });
       elem = document.elementFromPoint(commentObj.left, commentObj.top);
-      console.log(`new elem: ${elem.tagName}`);
     }
 
     const comment = createComment(commentObj);
@@ -200,6 +203,7 @@ export default class Application {
         .then(data => {
           this.onFileUploaded(data);
           this.isUpdated = true;
+          this.setCommentMode('on');
         });
     }
   }
