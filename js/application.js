@@ -17,6 +17,8 @@ export default class Application {
 
     this.imageLoader = container.querySelector('.image-loader');
     this.currentImage = container.querySelector('.current-image');
+
+    this.pageData = null;
     this.imageId = '';
     this.currentColor = 'green';
     this.page = 'https://netology-code.github.io/hj-26-malubimcev/';
@@ -42,15 +44,25 @@ export default class Application {
     ['dragenter', 'dragover', 'drop'].forEach(eventName => {
       this.container.addEventListener(eventName, event => event.preventDefault(), false);
     });
+
     this.container.addEventListener('drop', this.onDrop.bind(this), false);
+    this.currentImage.addEventListener('load', this.onImageLoad.bind(this), false);
   }
 
   onPageLoad() {
     this.imageId = window.location.search.slice(4);
     if (this.imageId) {
-      this.loadImage();
+      // this.loadImageData();
+      this.createWebSocketConnection();
+      this.setCommentMode('on');
     } else {
       this.setPublicationMode();
+    }
+  }
+
+  createWebSocketConnection() {
+    if (!this.connection) {
+      this.connection = new WSConnection(this);
     }
   }
 
@@ -63,7 +75,6 @@ export default class Application {
   setShareMode() {
     const id = this.imageId ? ('?id=' + this.imageId) : '';
     this.menu.linkField.value = this.page + id;
-    this.menu.setEditState();
     this.menu.setShareState();
     this.currentMode = 'share';
   }
@@ -71,23 +82,9 @@ export default class Application {
   setCommentMode(mode) {
     const commentsDisplayStyle = mode === 'on' ? 'visibility: visible; z-index: 9999;' : 'visibility: hidden; z-index: 0;';
     const formElements = this.container.querySelectorAll('.comments__form *');
-    // const markers = this.container.querySelectorAll('.comments__marker');
-    // const bodys = this.container.querySelectorAll('.comments__body');
-    // const inputs = this.container.querySelectorAll('.comments__marker-checkbox');
     for (const elem of formElements) {
       elem.style = commentsDisplayStyle;
     }
-    // for (const marker of markers) {
-    //   marker.style = display;
-    // }
-    // for (const body of bodys) {
-    //   body.style = display;
-    // }
-    // for (const inp of inputs) {
-    //   inp.style = display;
-    //   // inp.style.zIndex = 9999;
-    // }
-    this.menu.setEditState();
     this.menu.setCommentState();
     this.currentMode = 'comments';
   }
@@ -163,17 +160,21 @@ export default class Application {
     formData.append('title', file.name);
     formData.append('image', file, file.name);
     const loader = new FileLoader(this);
-    loader.upload(formData, '/pic', this.onFileUploaded.bind(this));
+    loader.upload(formData, '/pic', this.setImageSrc.bind(this));
   }
 
-  onFileUploaded(data) {
-    this.updatePage(data);
-    this.currentImage.addEventListener('load', (event) => {
+  setImageSrc(data) {
+    this.pageData = data;
+    this.currentImage.src = data.url;//будет выполнен обработчик onImageLoad()
+  }
+
+  onImageLoad(event) {
+    if (!this.drawer) {
       this.drawer = new Drawer(this.currentImage, this);
-    });
-    this.currentImage.src = data.url;
+    }
     this.imageLoader.style = 'display: none;';
-    this.connection = new WSConnection(this);
+    this.updatePage();
+    this.createWebSocketConnection();
     this.setShareMode();
   }
 
@@ -196,28 +197,28 @@ export default class Application {
     mask.src = url;
   }
 
-  loadImage() {
+  loadImageData() {
     if (!this.isUpdated) {
       const loader = new FileLoader(this);
       loader.loadData('/pic/' + this.imageId)
         .then(data => {
-          this.onFileUploaded(data);
+          this.pageData = data;
+          this.setImageSrc(data);
           this.isUpdated = true;
-          this.setCommentMode('on');
         });
     }
   }
 
-  updatePage(data) {
-    this.imageId = data.id;
-    if (data.mask) {
-      this.addMask(data.mask);
+  updatePage() {
+    this.imageId = this.pageData.id;
+    if (this.pageData.mask) {
+      this.addMask(this.pageData.mask);
     }
-    if (data.comments) {
-      for (const key in data.comments) {
-        this.addComment(data.comments[key]);
+    if (this.pageData.comments) {
+      for (const key in this.pageData.comments) {
+        this.addComment(this.pageData.comments[key]);
       }
     }
   }
 
-}
+}//end class

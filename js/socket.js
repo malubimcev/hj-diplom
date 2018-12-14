@@ -24,7 +24,7 @@ export default class WSConnection {
       console.log(`ws=${msg.event}`);
       switch(msg.event) {
         case 'pic':
-          this.app.loadImage();
+          this.app.loadImageData();
           break;
         case 'comment':
           this.app.addComment(msg.comment);

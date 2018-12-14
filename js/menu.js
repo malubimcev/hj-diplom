@@ -93,11 +93,13 @@ export default class Menu {
 
   setShareState() {
     this.resetState();
+    this.setEditState();
     this.menu.querySelector('.mode.share').dataset.state = 'selected';
   }
 
   setCommentState() {
     this.resetState();
+    this.setEditState();
     this.menu.querySelector('.mode.comments').dataset.state = 'selected';
   }
 
