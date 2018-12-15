@@ -160,7 +160,7 @@ export default class Application {
     formData.append('image', file, file.name);
     const loader = new FileLoader(this);
     loader.upload(formData, '/pic', () => {
-      this.setImageSrc.bind(this);
+      this.setImageSrc();
       this.setShareMode();
     });
   }
