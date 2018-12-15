@@ -21,7 +21,6 @@ export default class WSConnection {
     console.log(`ws.event.data=${event.data}`);
     try {
       const msg = JSON.parse(event.data);
-      console.log(`ws=${msg.event}`);
       switch(msg.event) {
         case 'pic':
           this.app.loadImageData();
@@ -33,7 +32,7 @@ export default class WSConnection {
           this.app.addMask(msg.url);
           break;
         case 'error':
-          console.log(`ws error: ${msg.message}`);
+          console.log(`ws event error: ${msg.message}`);
           break;
       }
     } catch (err) {

@@ -52,7 +52,6 @@ export default class Application {
   onPageLoad() {
     this.imageId = window.location.search.slice(4);
     if (this.imageId) {
-      // this.loadImageData();
       this.createWebSocketConnection();
       this.setCommentMode('on');
     } else {
@@ -160,7 +159,10 @@ export default class Application {
     formData.append('title', file.name);
     formData.append('image', file, file.name);
     const loader = new FileLoader(this);
-    loader.upload(formData, '/pic', this.setImageSrc.bind(this));
+    loader.upload(formData, '/pic', () => {
+      this.setImageSrc.bind(this);
+      setShareMode();
+    });
   }
 
   setImageSrc(data) {
@@ -175,7 +177,6 @@ export default class Application {
     this.imageLoader.style = 'display: none;';
     this.updatePage();
     this.createWebSocketConnection();
-    this.setShareMode();
   }
 
   onClick(event) {
