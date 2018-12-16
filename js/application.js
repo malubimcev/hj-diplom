@@ -194,7 +194,7 @@ export default class Application {
 
   addMask(url) {
     const mask = createMask(this.currentImage);
-    mask.addEventListener('load', this.currentImage.appendChild(mask));
+    mask.addEventListener('load', () => this.currentImage.appendChild(mask));
     mask.src = url;
   }
 
