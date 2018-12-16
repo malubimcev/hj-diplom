@@ -86,8 +86,8 @@ export class Drawer {
 
 export function createMask(container) {
   const mask = container.cloneNode();
-  mask.style.left = canvas.style.left;
-  mask.style.top = canvas.style.top;
+  mask.style.left = `${canvas.style.left}px`;
+  mask.style.top = `${canvas.style.top}px`;
   mask.width = canvas.width;
   mask.height = canvas.height;
   mask.style.zIndex = container.style.zIndex + 1;
