@@ -169,6 +169,7 @@ export default class Application {
 
   setImageSrc(data) {
     this.pageData = data;
+    this.imageId = this.pageData.id;
     this.currentImage.src = data.url;//будет выполнен обработчик onImageLoad()
   }
 
@@ -213,7 +214,6 @@ export default class Application {
   }
 
   updatePage() {
-    this.imageId = this.pageData.id;
     if (this.pageData.mask) {
       this.addMask(this.pageData.mask);
     }
