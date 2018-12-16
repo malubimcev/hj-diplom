@@ -24,9 +24,6 @@ export default class Application {
     this.page = 'https://netology-code.github.io/hj-26-malubimcev/';
     this.isUpdated = false;
 
-    // this.commentBoards = container.querySelectorAll('.comments__form');
-    // this.commentsPool = new Map();//для хранения форм с комментариями
-    
     this.error = container.querySelector('.error');
     this.errorMessage = container.querySelector('.error__message');
 
@@ -92,18 +89,18 @@ export default class Application {
     const commentBoard = new CommentBoard(null, this);
     commentBoard.board.style.left = `${coords.left}px`;
     commentBoard.board.style.top = `${coords.top}px`;
-    //this.commentsPool.add(commentBoard);
+    return commentBoard;
   }
 
   addComment(commentObj) {
     let elem = document.elementFromPoint(commentObj.left, commentObj.top);
 
     if (elem.className !== 'comments__body') {
-      this.addCommentBoard({
+      const form = this.addCommentBoard({
         'left': commentObj.left,
         'top': commentObj.top
       });
-      elem = document.elementFromPoint(commentObj.left, commentObj.top);
+      elem = form.board.querySelector('.comments__body');;
     }
 
     const comment = createComment(commentObj);
