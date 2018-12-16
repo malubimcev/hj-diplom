@@ -159,10 +159,12 @@ export default class Application {
     formData.append('title', file.name);
     formData.append('image', file, file.name);
     const loader = new FileLoader(this);
-    loader.upload(formData, '/pic', (data) => {
-      this.setImageSrc(data);
-      this.setShareMode();
-    });
+    loader.upload(formData, '/pic', this.onFileUploaded.bind(this));
+  }
+
+  onFileUploaded(data) {
+    this.setImageSrc(data);
+    this.setShareMode();
   }
 
   setImageSrc(data) {
