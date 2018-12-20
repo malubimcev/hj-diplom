@@ -181,9 +181,14 @@ export default class Application {
 
   onClick(event) {
     if (this.currentMode === 'comments') {
+      // console.log(`layerX=${event.layerX} layerY=${event.layerY}`);
+      // console.log(`pageX=${event.pageX} pageY=${event.pageY}`);
+      // console.log(`left=${event.target.style.left} top=${event.target.style.top}`);
       this.addCommentBoard({
         'left': event.pageX,
+        // 'left': event.layerX,// == undefined ? event.layerX : event.offsetX),
         'top': event.pageY
+        // 'top': event.layerY// == undefined ? event.layerY : event.offsetY)
       });
     }
   }
@@ -194,7 +199,6 @@ export default class Application {
 
   addMask(url) {
     const mask = createMask(this.currentImage);
-    console.log(`mask=${mask.tagName} ${mask.className} ${mask.toString()}`);
     mask.addEventListener('load', () => this.currentImage.parentElement.appendChild(mask));
     mask.src = url;
   }

@@ -66,7 +66,7 @@ export class Drawer {
       const node = this.app.container.querySelector('.error');
 
       mask.addEventListener('load', () => {
-        this.app.container.insertBefore(mask, node);
+        // this.app.container.insertBefore(mask, node);
         canvas.toBlob(blob => this.app.uploadMask(blob));
         this.clear();
       });
@@ -90,7 +90,6 @@ export function createMask(container) {
   mask.style.top = `${canvas.style.top}px`;
   mask.width = canvas.width;
   mask.height = canvas.height;
-  mask.style.zIndex = container.style.zIndex + 1;
   canvas.style.zIndex = mask.style.zIndex + 1;
   return mask;
 };
