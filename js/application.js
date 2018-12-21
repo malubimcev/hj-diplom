@@ -44,6 +44,8 @@ export default class Application {
 
     this.container.addEventListener('drop', this.onDrop.bind(this), false);
     this.currentImage.addEventListener('load', this.onImageLoad.bind(this), false);
+
+    window.addEventListener('resize', this.onResize.bind(this), false);
   }
 
   onPageLoad() {
@@ -64,6 +66,8 @@ export default class Application {
 
   setPublicationMode() {
     this.currentImage.src = '';
+    this.drawer = null;
+    this.commentsContainer = null;
     this.menu.setPublicationState();
     this.currentMode = 'publication';
   }
@@ -86,7 +90,7 @@ export default class Application {
   }
 
   addCommentBoard(coords) {
-    const commentBoard = new CommentBoard(null, this);
+    const commentBoard = new CommentBoard(this.commentsContainer, this);
     commentBoard.board.style.left = `${coords.left}px`;
     commentBoard.board.style.top = `${coords.top}px`;
     return commentBoard;
@@ -100,12 +104,24 @@ export default class Application {
         'left': commentObj.left,
         'top': commentObj.top
       });
-      elem = form.board.querySelector('.comments__body');;
+      elem = form.board.querySelector('.comments__body');
     }
 
     const comment = createComment(commentObj);
     const refNode = elem.querySelector('.comment div');
     elem.insertBefore(comment, refNode.parentElement);
+  }
+
+  onResize() {
+    const commentForms = this.container.querySelectorAll('.comments__form');
+    const containerCoords = this.commentsContainer.getBoundingClientRect();
+    for (const frm of commentForms) {
+      const formX = frm.offsetLeft;
+      const formY = frm.offsetTop;
+      console.log(`:${frm.style.left}: =${formX} / ${parseInt(containerCoords.left)}=`);
+      frm.style.left = frm.clientLeft + parseInt(containerCoords.left) + 'px';
+      frm.style.top = frm.clientTop + parseInt(containerCoords.top) + 'px';
+    }
   }
 
   setDrawMode() {
@@ -177,18 +193,19 @@ export default class Application {
     this.imageLoader.style = 'display: none;';
     this.updatePage();
     this.createWebSocketConnection();
+    if (!this.commentsContainer) {
+      this.createCommentsContainer();
+      this.commentsContainer.width = this.currentImage.offsetWidth;
+      this.commentsContainer.height = this.currentImage.offsetHeight;
+      console.log(`${this.commentsContainer.width}`);
+    }
   }
 
   onClick(event) {
     if (this.currentMode === 'comments') {
-      // console.log(`layerX=${event.layerX} layerY=${event.layerY}`);
-      // console.log(`pageX=${event.pageX} pageY=${event.pageY}`);
-      // console.log(`left=${event.target.style.left} top=${event.target.style.top}`);
       this.addCommentBoard({
         'left': event.pageX,
-        // 'left': event.layerX,// == undefined ? event.layerX : event.offsetX),
         'top': event.pageY
-        // 'top': event.layerY// == undefined ? event.layerY : event.offsetY)
       });
     }
   }
@@ -208,11 +225,25 @@ export default class Application {
       const loader = new FileLoader(this);
       loader.loadData('/pic/' + this.imageId)
         .then(data => {
-          this.pageData = data;
+          // this.pageData = data;
           this.setImageSrc(data);
           this.isUpdated = true;
         });
     }
+  }
+
+  createCommentsContainer() {
+    const box = document.createElement('div');
+    box.classList.add('comments-container');
+    box.style.left = '50%';
+    box.style.top = '50%';
+    box.style.position = 'absolute';
+    box.style.display = 'block';
+    box.style.transform = 'translate(-50%, -50%)';
+    box.textContent = ' ';
+
+    this.commentsContainer = box;
+    this.container.appendChild(this.commentsContainer);
   }
 
   updatePage() {

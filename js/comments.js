@@ -76,17 +76,14 @@ export function createComment(commentInfo) {
 
 export class CommentBoard {
   constructor(container, app) {
-    if (container) {
-      this.board = container;
-    } else {
-      this.board = createBoard();
-    }
+    this.board = createBoard();
     this.app = app;
-    this.app.container.appendChild(this.board);
+    container.appendChild(this.board);
     this.addButton = this.board.querySelector('.comments__submit');
     this.closeButton = this.board.querySelector('.comments__close');
     this.commentInput = this.board.querySelector('.comments__input');
     this.body = this.board.querySelector('.comments__body');
+    // this.marker = this.board.querySelector('.comments__marker');
     this.commentLoader = this.board.querySelector('.comment div');
 
     this.registerEvents();

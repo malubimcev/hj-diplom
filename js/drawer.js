@@ -66,9 +66,11 @@ export class Drawer {
       const node = this.app.container.querySelector('.error');
 
       mask.addEventListener('load', () => {
-        // this.app.container.insertBefore(mask, node);
-        canvas.toBlob(blob => this.app.uploadMask(blob));
-        this.clear();
+        this.app.container.insertBefore(mask, node);
+        canvas.toBlob(blob => {
+          this.app.uploadMask(blob);
+          this.clear();
+        });
       });
       mask.src = canvas.toDataURL();
     }
