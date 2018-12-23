@@ -17,6 +17,7 @@ export default class Application {
 
     this.imageLoader = container.querySelector('.image-loader');
     this.currentImage = container.querySelector('.current-image');
+    this.currentImageCoords = null;
 
     this.pageData = null;
     this.imageId = '';
@@ -90,7 +91,7 @@ export default class Application {
   }
 
   addCommentBoard(coords) {
-    const commentBoard = new CommentBoard(this.commentsContainer, this);
+    const commentBoard = new CommentBoard(this.container, this);
     commentBoard.board.style.left = `${coords.left}px`;
     commentBoard.board.style.top = `${coords.top}px`;
     return commentBoard;
@@ -113,15 +114,13 @@ export default class Application {
   }
 
   onResize() {
+    const newImageCoords = this.currentImage.getBoundingClientRect();
     const commentForms = this.container.querySelectorAll('.comments__form');
-    const containerCoords = this.commentsContainer.getBoundingClientRect();
     for (const frm of commentForms) {
-      const formX = frm.offsetLeft;
-      const formY = frm.offsetTop;
-      console.log(`:${frm.style.left}: =${formX} / ${parseInt(containerCoords.left)}=`);
-      frm.style.left = frm.clientLeft + parseInt(containerCoords.left) + 'px';
-      frm.style.top = frm.clientTop + parseInt(containerCoords.top) + 'px';
+      frm.style.left = `${parseInt(frm.style.left) + parseInt(newImageCoords.left - this.currentImageCoords.left)}px`;
+      frm.style.top = `${parseInt(frm.style.top) + parseInt(newImageCoords.top - this.currentImageCoords.top)}px`;
     }
+    this.currentImageCoords = newImageCoords;
   }
 
   setDrawMode() {
@@ -192,13 +191,14 @@ export default class Application {
     }
     this.imageLoader.style = 'display: none;';
     this.updatePage();
+    this.currentImageCoords = this.currentImage.getBoundingClientRect();
     this.createWebSocketConnection();
-    if (!this.commentsContainer) {
-      this.createCommentsContainer();
-      this.commentsContainer.width = this.currentImage.offsetWidth;
-      this.commentsContainer.height = this.currentImage.offsetHeight;
-      console.log(`${this.commentsContainer.width}`);
-    }
+    // if (!this.commentsContainer) {
+    //   this.createCommentsContainer();
+    //   this.commentsContainer.width = this.currentImage.offsetWidth;
+    //   this.commentsContainer.height = this.currentImage.offsetHeight;
+    //   console.log(`${this.commentsContainer.width} -- ${this.commentsContainer.height}`);
+    // }
   }
 
   onClick(event) {
@@ -225,26 +225,25 @@ export default class Application {
       const loader = new FileLoader(this);
       loader.loadData('/pic/' + this.imageId)
         .then(data => {
-          // this.pageData = data;
           this.setImageSrc(data);
           this.isUpdated = true;
         });
     }
   }
 
-  createCommentsContainer() {
-    const box = document.createElement('div');
-    box.classList.add('comments-container');
-    box.style.left = '50%';
-    box.style.top = '50%';
-    box.style.position = 'absolute';
-    box.style.display = 'block';
-    box.style.transform = 'translate(-50%, -50%)';
-    box.textContent = ' ';
+  // createCommentsContainer() {
+  //   const box = document.createElement('div');
+  //   box.classList.add('comments-container');
+  //   box.style.left = '50%';
+  //   box.style.top = '50%';
+  //   box.style.position = 'absolute';
+  //   box.style.display = 'block';
+  //   box.style.transform = 'translate(-50%, -50%)';
+  //   box.textContent = '';
 
-    this.commentsContainer = box;
-    this.container.appendChild(this.commentsContainer);
-  }
+  //   this.commentsContainer = box;
+  //   this.container.appendChild(this.commentsContainer);
+  // }
 
   updatePage() {
     if (this.pageData.mask) {

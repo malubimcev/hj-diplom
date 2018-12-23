@@ -27,7 +27,7 @@ export class Drawer {
     canvas.style.transform = 'translate(-50%, -50%)';
     color = colors[this.app.currentColor];
 
-    document.querySelector('.app').appendChild(canvas);
+    this.app.container.appendChild(canvas);
     
     this.registerEvents();
   }
