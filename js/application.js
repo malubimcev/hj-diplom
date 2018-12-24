@@ -81,10 +81,13 @@ export default class Application {
   }
 
   setCommentMode(mode) {
-    const commentsDisplayStyle = mode === 'on' ? 'visibility: visible; z-index: 9999;' : 'visibility: hidden; z-index: 0;';
+    const forms = this.container.querySelectorAll('.comments__form');
     const formElements = this.container.querySelectorAll('.comments__form *');
+    for (const frm of forms) {
+      frm.style.zIndex = mode === 'on' ? 100 : 0;
+    }
     for (const elem of formElements) {
-      elem.style = commentsDisplayStyle;
+      elem.style = mode === 'on' ? 'visibility: visible;' : 'visibility: hidden;';;
     }
     this.menu.setCommentState();
     this.currentMode = 'comments';
@@ -118,8 +121,7 @@ export default class Application {
     const commentForms = this.container.querySelectorAll('.comments__form');
     for (const frm of commentForms) {
       frm.style.left = `${parseInt(frm.style.left) + parseInt(newImageCoords.left - this.currentImageCoords.left)}px`;
-      frm.style.top = `${parseInt(frm.style.top) + parseInt(newImageCoords.top - this.currentImageCoords.top)}px`;
-    }
+      frm.style.top = `${parseInt(frm.style.top) + parseInt(newImageCoords.top - this.currentImageCoords.top)}px`;    }
     this.currentImageCoords = newImageCoords;
   }
 
@@ -216,7 +218,7 @@ export default class Application {
 
   addMask(url) {
     const mask = createMask(this.currentImage);
-    mask.addEventListener('load', () => this.currentImage.parentElement.appendChild(mask));
+    mask.addEventListener('load', () => this.currentImage.parentElement.insertBefore(mask, this.error));
     mask.src = url;
   }
 
