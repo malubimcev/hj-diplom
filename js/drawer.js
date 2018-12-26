@@ -3,6 +3,10 @@
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
 const BRUSH_RADIUS = 4;
+const MASK_DELAY = 1000;// Задержка создания и отправки маски:
+// в течение этого периода пользователь может продолжить рисовать (со сбросом таймера),
+// после окончания периода задержки происходит формирование и отправка маски на сервер.
+let timeout;// Таймер для задержки отправки маски.
 let isDrawing = false;
 const colors = {
   'red': '#EA5D56',
@@ -34,6 +38,7 @@ export class Drawer {
 
   registerEvents() {
     canvas.addEventListener('mousedown', (event) => {
+      clearTimeout(timeout);
       if (this.app.currentMode === 'draw') {
         const point = [event.offsetX, event.offsetY];
         ctx.lineWidth = BRUSH_RADIUS;
@@ -56,8 +61,12 @@ export class Drawer {
 
     ['mouseup', 'mouseleave'].forEach(evName => canvas.addEventListener(evName, () => isDrawing = false));
     
-    canvas.addEventListener('mouseup', this.newMask.bind(this), false);
+    canvas.addEventListener('mouseup', this.onMouseUp.bind(this), false);
     canvas.addEventListener('click', this.app.onClick.bind(this.app), false);
+  }
+
+  onMouseUp() {
+    debounce(this.newMask.bind(this), MASK_DELAY);
   }
 
   newMask() {
@@ -105,3 +114,11 @@ function draw(point) {
 function tick() {
   window.requestAnimationFrame(tick);
 }
+
+function debounce(callback,  delay) {
+  clearTimeout(timeout);
+  timeout = setTimeout(() => {
+    timeout = null;
+    callback();
+  }, delay);
+};

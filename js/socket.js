@@ -1,7 +1,5 @@
 'use strict';
 
-const SEND_DELAY = 1000;//задержка отправки сообщения
-
 export default class WSConnection {
   constructor(app) {
     this.app = app;
@@ -40,7 +38,7 @@ export default class WSConnection {
   }
 
   send(msg) {
-    setTimeout(() => this.ws.send(msg), SEND_DELAY);
+    this.ws.send(msg);
   }
 
 }//end class

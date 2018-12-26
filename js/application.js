@@ -195,12 +195,11 @@ export default class Application {
     this.updatePage();
     this.currentImageCoords = this.currentImage.getBoundingClientRect();
     this.createWebSocketConnection();
-    // if (!this.commentsContainer) {
-    //   this.createCommentsContainer();
-    //   this.commentsContainer.width = this.currentImage.offsetWidth;
-    //   this.commentsContainer.height = this.currentImage.offsetHeight;
-    //   console.log(`${this.commentsContainer.width} -- ${this.commentsContainer.height}`);
-    // }
+    if (!this.commentsContainer) {
+      this.createCommentsContainer();
+      this.commentsContainer.width = this.currentImage.offsetWidth;
+      this.commentsContainer.height = this.currentImage.offsetHeight;
+    }
   }
 
   onClick(event) {
@@ -233,19 +232,19 @@ export default class Application {
     }
   }
 
-  // createCommentsContainer() {
-  //   const box = document.createElement('div');
-  //   box.classList.add('comments-container');
-  //   box.style.left = '50%';
-  //   box.style.top = '50%';
-  //   box.style.position = 'absolute';
-  //   box.style.display = 'block';
-  //   box.style.transform = 'translate(-50%, -50%)';
-  //   box.textContent = '';
+  createCommentsContainer() {
+    const box = document.createElement('div');
+    box.classList.add('comments-container');
+    box.style.left = '50%';
+    box.style.top = '50%';
+    box.style.position = 'absolute';
+    box.style.display = 'block';
+    box.style.transform = 'translate(-50%, -50%)';
+    box.textContent = '';
 
-  //   this.commentsContainer = box;
-  //   this.container.appendChild(this.commentsContainer);
-  // }
+    this.commentsContainer = box;
+    this.container.appendChild(this.commentsContainer);
+  }
 
   updatePage() {
     if (this.pageData.mask) {
