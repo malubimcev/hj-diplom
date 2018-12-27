@@ -32,6 +32,7 @@ export class Drawer {
     color = colors[this.app.currentColor];
 
     this.app.container.appendChild(canvas);
+    this.canvas = canvas;
     
     this.registerEvents();
   }
@@ -62,7 +63,7 @@ export class Drawer {
     ['mouseup', 'mouseleave'].forEach(evName => canvas.addEventListener(evName, () => isDrawing = false));
     
     canvas.addEventListener('mouseup', this.onMouseUp.bind(this), false);
-    canvas.addEventListener('click', this.app.onClick.bind(this.app), false);
+    // canvas.addEventListener('click', this.app.onClick.bind(this.app), false);
   }
 
   onMouseUp() {
@@ -75,7 +76,7 @@ export class Drawer {
       const node = this.app.container.querySelector('.error');
 
       mask.addEventListener('load', () => {
-        this.app.container.insertBefore(mask, node);
+        // this.app.container.insertBefore(mask, node);
         canvas.toBlob(blob => {
           this.app.uploadMask(blob);
           this.clear();
@@ -97,6 +98,7 @@ export class Drawer {
 
 export function createMask(container) {
   const mask = container.cloneNode();
+  mask.classList.add('mask');
   mask.style.left = `${canvas.style.left}px`;
   mask.style.top = `${canvas.style.top}px`;
   mask.width = canvas.width;

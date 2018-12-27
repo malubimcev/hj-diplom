@@ -83,7 +83,6 @@ export class CommentBoard {
     this.closeButton = this.board.querySelector('.comments__close');
     this.commentInput = this.board.querySelector('.comments__input');
     this.body = this.board.querySelector('.comments__body');
-    // this.marker = this.board.querySelector('.comments__marker');
     this.commentLoader = this.board.querySelector('.comment div');
 
     this.registerEvents();

@@ -32,6 +32,7 @@ export default class Application {
     this.drawer = null;
     this.currentMode = '';
     this.connection = null;
+    this.commentsContainer = null;
 
     this.registerEvents();
   }
@@ -81,10 +82,11 @@ export default class Application {
   }
 
   setCommentMode(mode) {
+    this.commentsContainer.style.zIndex = this.drawer.canvas.style.zIndex + 1;
     const forms = this.container.querySelectorAll('.comments__form');
     const formElements = this.container.querySelectorAll('.comments__form *');
     for (const frm of forms) {
-      frm.style.zIndex = mode === 'on' ? 100 : 0;
+      frm.style.zIndex = mode === 'on' ? 10 : 0;
     }
     for (const elem of formElements) {
       elem.style = mode === 'on' ? 'visibility: visible;' : 'visibility: hidden;';;
@@ -93,10 +95,22 @@ export default class Application {
     this.currentMode = 'comments';
   }
 
+  setDrawMode() {
+    this.commentsContainer.style.zIndex = this.drawer.canvas.style.zIndex - 1;
+    this.currentMode = 'draw';
+  }
+
+  setErrorMode(errMessage) {
+    this.currentMode = 'error';
+    this.imageLoader.style = 'display: none;';
+    this.error.style = 'display: block;';
+    this.errorMessage.textContent = errMessage;
+  }
+
   addCommentBoard(coords) {
-    const commentBoard = new CommentBoard(this.container, this);
-    commentBoard.board.style.left = `${coords.left}px`;
-    commentBoard.board.style.top = `${coords.top}px`;
+    const commentBoard = new CommentBoard(this.commentsContainer, this);
+    commentBoard.board.style.left = `${coords.left - this.currentImageCoords.left}px`;
+    commentBoard.board.style.top = `${coords.top - this.currentImageCoords.top}px`;
     return commentBoard;
   }
 
@@ -125,22 +139,11 @@ export default class Application {
     this.currentImageCoords = newImageCoords;
   }
 
-  setDrawMode() {
-    this.currentMode = 'draw';
-  }
-
   setColor(colorName) {
     this.currentColor = colorName;
     if (this.drawer) {
       this.drawer.setColor(this.currentColor);
     }
-  }
-
-  setErrorMode(errMessage) {
-    this.currentMode = 'error';
-    this.imageLoader.style = 'display: none;';
-    this.error.style = 'display: block;';
-    this.errorMessage.textContent = errMessage;
   }
 
   selectFile() {
@@ -188,17 +191,34 @@ export default class Application {
   }
 
   onImageLoad(event) {
-    if (!this.drawer) {
-      this.drawer = new Drawer(this.currentImage, this);
-    }
     this.imageLoader.style = 'display: none;';
-    this.updatePage();
-    this.currentImageCoords = this.currentImage.getBoundingClientRect();
-    this.createWebSocketConnection();
+    this.clearPage();
+
+    this.drawer = new Drawer(this.currentImage, this);
+
     if (!this.commentsContainer) {
       this.createCommentsContainer();
-      this.commentsContainer.width = this.currentImage.offsetWidth;
-      this.commentsContainer.height = this.currentImage.offsetHeight;
+    }
+    this.commentsContainer.style.width = `${this.currentImage.offsetWidth}px`;
+    this.commentsContainer.style.height = `${this.currentImage.offsetHeight}px`;
+
+    this.updatePage();
+    this.createWebSocketConnection();
+  }
+
+  clearPage() {
+    if (this.drawer) {
+      const masks = this.container.querySelectorAll('.mask');
+      for (const mask of masks) {
+        this.container.removeChild(mask);
+      }      
+      this.drawer = null;
+    }
+    if (this.commentsContainer) {
+      const commentBoards = this.commentsContainer.querySelectorAll('.comments__form');
+      for (const board of commentBoards) {
+        this.commentsContainer.removeChild(board);
+      }
     }
   }
 
@@ -233,20 +253,19 @@ export default class Application {
   }
 
   createCommentsContainer() {
-    const box = document.createElement('div');
-    box.classList.add('comments-container');
-    box.style.left = '50%';
-    box.style.top = '50%';
-    box.style.position = 'absolute';
-    box.style.display = 'block';
-    box.style.transform = 'translate(-50%, -50%)';
-    box.textContent = '';
+    this.commentsContainer = document.createElement('div');
+    this.commentsContainer.classList.add('comments-container');
+    this.commentsContainer.style.left = '50%';
+    this.commentsContainer.style.top = '50%';
+    this.commentsContainer.style.position = 'absolute';
+    this.commentsContainer.style.transform = 'translate(-50%, -50%)';
 
-    this.commentsContainer = box;
-    this.container.appendChild(this.commentsContainer);
+    this.container.insertBefore(this.commentsContainer, this.error);
+    this.commentsContainer.addEventListener('click', this.onClick.bind(this), false);
   }
 
   updatePage() {
+    this.currentImageCoords = this.currentImage.getBoundingClientRect();
     if (this.pageData.mask) {
       this.addMask(this.pageData.mask);
     }
