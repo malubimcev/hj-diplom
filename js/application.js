@@ -84,7 +84,7 @@ export default class Application {
     const forms = this.container.querySelectorAll('.comments__form');
     const formElements = this.container.querySelectorAll('.comments__form *');
     for (const frm of forms) {
-      frm.style.zIndex = mode === 'on' ? 10 : 0;
+      frm.style.zIndex = mode === 'on' ? 2 : 0;
     }
     for (const elem of formElements) {
       elem.style = mode === 'on' ? 'visibility: visible;' : 'visibility: hidden;';;
@@ -115,7 +115,7 @@ export default class Application {
   addComment(commentObj) {
     commentObj.left += parseInt(this.currentImageCoords.left);
     commentObj.top += parseInt(this.currentImageCoords.top);
-    let elem = document.elementFromPoint(commentObj.left + 1, commentObj.top + 1);
+    let elem = document.elementFromPoint(commentObj.left + 10, commentObj.top + 10);
 
     if (elem.className !== 'comments__body') {
       const form = this.addCommentBoard({
@@ -219,7 +219,7 @@ export default class Application {
         this.addCommentBoard({
           'left': event.pageX,
           'top': event.pageY
-        });        
+        });
       }
     }
   }
