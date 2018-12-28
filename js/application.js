@@ -46,8 +46,6 @@ export default class Application {
 
     this.container.addEventListener('drop', this.onDrop.bind(this), false);
     this.currentImage.addEventListener('load', this.onImageLoad.bind(this), false);
-
-    window.addEventListener('resize', this.onResize.bind(this), false);
   }
 
   onPageLoad() {
@@ -115,7 +113,9 @@ export default class Application {
   }
 
   addComment(commentObj) {
-    let elem = document.elementFromPoint(commentObj.left, commentObj.top);
+    commentObj.left += parseInt(this.currentImageCoords.left);
+    commentObj.top += parseInt(this.currentImageCoords.top);
+    let elem = document.elementFromPoint(commentObj.left + 1, commentObj.top + 1);
 
     if (elem.className !== 'comments__body') {
       const form = this.addCommentBoard({
@@ -128,15 +128,6 @@ export default class Application {
     const comment = createComment(commentObj);
     const refNode = elem.querySelector('.comment div');
     elem.insertBefore(comment, refNode.parentElement);
-  }
-
-  onResize() {
-    const newImageCoords = this.currentImage.getBoundingClientRect();
-    const commentForms = this.container.querySelectorAll('.comments__form');
-    for (const frm of commentForms) {
-      frm.style.left = `${parseInt(frm.style.left) + parseInt(newImageCoords.left - this.currentImageCoords.left)}px`;
-      frm.style.top = `${parseInt(frm.style.top) + parseInt(newImageCoords.top - this.currentImageCoords.top)}px`;    }
-    this.currentImageCoords = newImageCoords;
   }
 
   setColor(colorName) {
@@ -224,10 +215,12 @@ export default class Application {
 
   onClick(event) {
     if (this.currentMode === 'comments') {
-      this.addCommentBoard({
-        'left': event.pageX,
-        'top': event.pageY
-      });
+      if (event.target.className === 'comments-container') {
+        this.addCommentBoard({
+          'left': event.pageX,
+          'top': event.pageY
+        });        
+      }
     }
   }
 

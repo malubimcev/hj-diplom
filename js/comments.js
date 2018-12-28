@@ -78,6 +78,7 @@ export class CommentBoard {
   constructor(container, app) {
     this.board = createBoard();
     this.app = app;
+    this.board.style.zIndex = container.style.zIndex + 1;
     container.appendChild(this.board);
     this.addButton = this.board.querySelector('.comments__submit');
     this.closeButton = this.board.querySelector('.comments__close');

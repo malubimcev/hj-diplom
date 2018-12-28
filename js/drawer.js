@@ -63,7 +63,6 @@ export class Drawer {
     ['mouseup', 'mouseleave'].forEach(evName => canvas.addEventListener(evName, () => isDrawing = false));
     
     canvas.addEventListener('mouseup', this.onMouseUp.bind(this), false);
-    // canvas.addEventListener('click', this.app.onClick.bind(this.app), false);
   }
 
   onMouseUp() {
@@ -76,7 +75,6 @@ export class Drawer {
       const node = this.app.container.querySelector('.error');
 
       mask.addEventListener('load', () => {
-        // this.app.container.insertBefore(mask, node);
         canvas.toBlob(blob => {
           this.app.uploadMask(blob);
           this.clear();
