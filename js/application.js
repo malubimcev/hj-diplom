@@ -51,6 +51,8 @@ export default class Application {
   onPageLoad() {
     this.imageId = window.location.search.slice(4);
     if (this.imageId) {
+      this.createCommentsContainer();
+      console.log(this.commentsContainer.className);
       this.createWebSocketConnection();
       this.setCommentMode('on');
     } else {
@@ -115,8 +117,8 @@ export default class Application {
   addComment(commentObj) {
     commentObj.left += parseInt(this.currentImageCoords.left);
     commentObj.top += parseInt(this.currentImageCoords.top);
-    let elem = document.elementFromPoint(commentObj.left + 10, commentObj.top + 10);
-
+    let elem = document.elementFromPoint(commentObj.left + 5, commentObj.top + 5);
+console.log(elem.className);
     if (elem.className !== 'comments__body') {
       const form = this.addCommentBoard({
         'left': commentObj.left,
@@ -202,7 +204,7 @@ export default class Application {
       const masks = this.container.querySelectorAll('.mask');
       for (const mask of masks) {
         this.container.removeChild(mask);
-      }      
+      }
       this.drawer = null;
     }
     if (this.commentsContainer) {
