@@ -126,4 +126,30 @@ export class CommentBoard {
     this.body.insertBefore(comment, this.commentLoader);
   }
 
-}
+}//end class CommentBoard
+
+export class CommentsContainer {
+
+  constructor(app) {
+    this.app = app;
+    this.container = document.createElement('div');
+    this.container.classList.add('current-image');
+    this.container.classList.add('comments-container');
+
+    app.container.insertBefore(this.container, app.error);
+    this.registerEvents();
+  }
+
+  registerEvents() {
+    this.container.addEventListener('click', this.onClick.bind(this), false);
+  }
+
+  addBoard() {
+
+  }
+
+  onClick() {
+    
+  }
+
+}//end class CommentsContainer

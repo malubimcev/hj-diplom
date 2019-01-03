@@ -4,6 +4,7 @@ import Menu from "./menu.js";
 import FileLoader from "./loader.js";
 import WSConnection from "./socket.js";
 import {CommentBoard} from "./comments.js";
+import {CommentsContainer} from "./comments.js";
 import {createComment} from "./comments.js";
 import {Drawer} from "./drawer.js";
 import {createMask} from "./drawer.js";
@@ -51,8 +52,7 @@ export default class Application {
   onPageLoad() {
     this.imageId = window.location.search.slice(4);
     if (this.imageId) {
-      this.createCommentsContainer();
-      console.log(this.commentsContainer.className);
+      this.commentsContainer = new CommentsContainer();
       this.createWebSocketConnection();
       this.setCommentMode('on');
     } else {
@@ -89,7 +89,7 @@ export default class Application {
       frm.style.zIndex = mode === 'on' ? 2 : 0;
     }
     for (const elem of formElements) {
-      elem.style = mode === 'on' ? 'visibility: visible;' : 'visibility: hidden;';;
+      elem.style = mode === 'on' ? 'visibility: visible;' : 'visibility: hidden;';
     }
     this.menu.setCommentState();
     this.currentMode = 'comments';
@@ -190,7 +190,7 @@ console.log(elem.className);
     this.drawer = new Drawer(this.currentImage, this);
 
     if (!this.commentsContainer) {
-      this.createCommentsContainer();
+      this.commentsContainer = new CommentsContainer();
     }
     this.commentsContainer.style.width = `${this.currentImage.offsetWidth}px`;
     this.commentsContainer.style.height = `${this.currentImage.offsetHeight}px`;
@@ -245,18 +245,6 @@ console.log(elem.className);
           this.isUpdated = true;
         });
     }
-  }
-
-  createCommentsContainer() {
-    this.commentsContainer = document.createElement('div');
-    this.commentsContainer.classList.add('comments-container');
-    this.commentsContainer.style.left = '50%';
-    this.commentsContainer.style.top = '50%';
-    this.commentsContainer.style.position = 'absolute';
-    this.commentsContainer.style.transform = 'translate(-50%, -50%)';
-
-    this.container.insertBefore(this.commentsContainer, this.error);
-    this.commentsContainer.addEventListener('click', this.onClick.bind(this), false);
   }
 
   updatePage() {
