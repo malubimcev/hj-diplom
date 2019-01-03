@@ -52,7 +52,7 @@ export default class Application {
   onPageLoad() {
     this.imageId = window.location.search.slice(4);
     if (this.imageId) {
-      this.commentsContainer = new CommentsContainer();
+      this.commentsContainer = new CommentsContainer(this);
       this.createWebSocketConnection();
       this.setCommentMode('on');
     } else {
@@ -190,7 +190,7 @@ console.log(elem.className);
     this.drawer = new Drawer(this.currentImage, this);
 
     if (!this.commentsContainer) {
-      this.commentsContainer = new CommentsContainer();
+      this.commentsContainer = new CommentsContainer(this);
     }
     this.commentsContainer.style.width = `${this.currentImage.offsetWidth}px`;
     this.commentsContainer.style.height = `${this.currentImage.offsetHeight}px`;
