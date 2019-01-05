@@ -72,7 +72,6 @@ export class Drawer {
   newMask() {
     if (this.app.currentMode === 'draw') {
       const mask = createMask(this.image);
-      const node = this.app.container.querySelector('.error');
 
       mask.addEventListener('load', () => {
         canvas.toBlob(blob => {

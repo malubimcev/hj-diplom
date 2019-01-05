@@ -53,7 +53,7 @@ function createBoard() {
   return form;
 }
 
-export function createComment(commentInfo) {
+function createComment(commentInfo) {
   const timestamp = document.createElement('p');
   timestamp.classList.add('comment__time');
   const date = new Date(commentInfo.timestamp);
@@ -74,7 +74,7 @@ export function createComment(commentInfo) {
   return comment;
 }
 
-export class CommentBoard {
+class CommentBoard {
   constructor(container, app) {
     this.board = createBoard();
     this.app = app;
@@ -133,23 +133,73 @@ export class CommentsContainer {
   constructor(app) {
     this.app = app;
     this.container = document.createElement('div');
-    this.container.classList.add('current-image');
     this.container.classList.add('comments-container');
 
     app.container.insertBefore(this.container, app.error);
+    this.container.style.width = `${app.currentImage.offsetWidth}px`;
+    this.container.style.height = `${app.currentImage.offsetHeight}px`;
+    this.container.style.left = '50%';
+    this.container.style.top = '50%';
+    this.container.style.position = 'absolute';
+    this.container.style.transform = 'translate(-50%, -50%)';
     this.registerEvents();
   }
 
   registerEvents() {
     this.container.addEventListener('click', this.onClick.bind(this), false);
   }
+  
+  addBoard(coords) {
+    const commentBoard = new CommentBoard(this.container, this.app);
+    commentBoard.board.style.left = `${coords.left - this.container.left}px`;
+    commentBoard.board.style.top = `${coords.top - this.container.top}px`;
+    return commentBoard;
+  }
+  
+  addComment(commentObj) {
+    commentObj.left += parseInt(this.container.style.left);
+    commentObj.top += parseInt(this.container.style.top);
+    let elem = document.elementFromPoint(commentObj.left + 5, commentObj.top + 5);
+    if (elem.className !== 'comments__body') {
+      const form = this.addBoard({
+        'left': commentObj.left,
+        'top': commentObj.top
+      });
+      elem = form.board.querySelector('.comments__body');
+    }
 
-  addBoard() {
-
+    const comment = createComment(commentObj);
+    const refNode = elem.querySelector('.comment div');
+    elem.insertBefore(comment, refNode.parentElement);
+  }
+  
+  removeAll() {
+    const commentBoards = this.container.querySelectorAll('.comments__form');
+    for (const board of commentBoards) {
+      this.container.removeChild(board);
+    }
   }
 
-  onClick() {
-    
+  onClick(event) {
+    if (this.app.currentMode === 'comments') {
+      if (event.target.className === 'comments-container') {
+        this.addBoard({
+          'left': event.pageX,
+          'top': event.pageY
+        });
+      }
+    }
+  }
+
+  show(mode) {
+    const forms = this.container.querySelectorAll('.comments__form');
+    const formElements = this.container.querySelectorAll('.comments__form *');
+    for (const frm of forms) {
+      frm.style.zIndex = mode === 'on' ? 2 : 0;
+    }
+    for (const elem of formElements) {
+      elem.style = mode === 'on' ? 'visibility: visible;' : 'visibility: hidden;';
+    }
   }
 
 }//end class CommentsContainer

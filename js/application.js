@@ -3,9 +3,7 @@
 import Menu from "./menu.js";
 import FileLoader from "./loader.js";
 import WSConnection from "./socket.js";
-import {CommentBoard} from "./comments.js";
 import {CommentsContainer} from "./comments.js";
-import {createComment} from "./comments.js";
 import {Drawer} from "./drawer.js";
 import {createMask} from "./drawer.js";
 
@@ -52,7 +50,6 @@ export default class Application {
   onPageLoad() {
     this.imageId = window.location.search.slice(4);
     if (this.imageId) {
-      this.commentsContainer = new CommentsContainer(this);
       this.createWebSocketConnection();
       this.setCommentMode('on');
     } else {
@@ -82,21 +79,14 @@ export default class Application {
   }
 
   setCommentMode(mode) {
-    this.commentsContainer.style.zIndex = this.drawer.canvas.style.zIndex + 1;
-    const forms = this.container.querySelectorAll('.comments__form');
-    const formElements = this.container.querySelectorAll('.comments__form *');
-    for (const frm of forms) {
-      frm.style.zIndex = mode === 'on' ? 2 : 0;
-    }
-    for (const elem of formElements) {
-      elem.style = mode === 'on' ? 'visibility: visible;' : 'visibility: hidden;';
-    }
+    this.commentsContainer.container.style.zIndex = this.drawer.canvas.style.zIndex + 1;
+    this.commentsContainer.show(mode);
     this.menu.setCommentState();
     this.currentMode = 'comments';
   }
 
   setDrawMode() {
-    this.commentsContainer.style.zIndex = this.drawer.canvas.style.zIndex - 1;
+    this.commentsContainer.container.style.zIndex = 0;
     this.currentMode = 'draw';
   }
 
@@ -105,31 +95,6 @@ export default class Application {
     this.imageLoader.style = 'display: none;';
     this.error.style = 'display: block;';
     this.errorMessage.textContent = errMessage;
-  }
-
-  addCommentBoard(coords) {
-    const commentBoard = new CommentBoard(this.commentsContainer, this);
-    commentBoard.board.style.left = `${coords.left - this.currentImageCoords.left}px`;
-    commentBoard.board.style.top = `${coords.top - this.currentImageCoords.top}px`;
-    return commentBoard;
-  }
-
-  addComment(commentObj) {
-    commentObj.left += parseInt(this.currentImageCoords.left);
-    commentObj.top += parseInt(this.currentImageCoords.top);
-    let elem = document.elementFromPoint(commentObj.left + 5, commentObj.top + 5);
-console.log(elem.className);
-    if (elem.className !== 'comments__body') {
-      const form = this.addCommentBoard({
-        'left': commentObj.left,
-        'top': commentObj.top
-      });
-      elem = form.board.querySelector('.comments__body');
-    }
-
-    const comment = createComment(commentObj);
-    const refNode = elem.querySelector('.comment div');
-    elem.insertBefore(comment, refNode.parentElement);
   }
 
   setColor(colorName) {
@@ -192,8 +157,6 @@ console.log(elem.className);
     if (!this.commentsContainer) {
       this.commentsContainer = new CommentsContainer(this);
     }
-    this.commentsContainer.style.width = `${this.currentImage.offsetWidth}px`;
-    this.commentsContainer.style.height = `${this.currentImage.offsetHeight}px`;
 
     this.updatePage();
     this.createWebSocketConnection();
@@ -208,21 +171,8 @@ console.log(elem.className);
       this.drawer = null;
     }
     if (this.commentsContainer) {
-      const commentBoards = this.commentsContainer.querySelectorAll('.comments__form');
-      for (const board of commentBoards) {
-        this.commentsContainer.removeChild(board);
-      }
-    }
-  }
-
-  onClick(event) {
-    if (this.currentMode === 'comments') {
-      if (event.target.className === 'comments-container') {
-        this.addCommentBoard({
-          'left': event.pageX,
-          'top': event.pageY
-        });
-      }
+      this.commentsContainer.removeAll();
+      this.commentsContainer = null;
     }
   }
 
@@ -254,7 +204,7 @@ console.log(elem.className);
     }
     if (this.pageData.comments) {
       for (const key in this.pageData.comments) {
-        this.addComment(this.pageData.comments[key]);
+        this.commentsContainer.addComment(this.pageData.comments[key]);
       }
     }
   }
