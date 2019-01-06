@@ -79,7 +79,7 @@ export default class Application {
   }
 
   setCommentMode(mode) {
-    this.commentsContainer.container.style.zIndex = this.drawer.canvas.style.zIndex + 1;
+    this.commentsContainer.container.style.zIndex = parseInt(this.drawer.canvas.style.zIndex) + 1;
     this.commentsContainer.show(mode);
     this.menu.setCommentState();
     this.currentMode = 'comments';

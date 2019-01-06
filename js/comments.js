@@ -90,8 +90,8 @@ class CommentBoard {
   }
 
   registerEvents() {
-    this.closeButton.addEventListener('click', this.close.bind(this));
-    this.addButton.addEventListener('click', this.sendComment.bind(this));
+    this.closeButton.addEventListener('click', this.close.bind(this), false);
+    this.addButton.addEventListener('click', this.sendComment.bind(this), false);
   }
 
   sendComment(event) {
@@ -178,6 +178,7 @@ export class CommentsContainer {
     for (const board of commentBoards) {
       this.container.removeChild(board);
     }
+    this.app.container.removeChild(this.container);
   }
 
   onClick(event) {
