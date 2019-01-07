@@ -19,16 +19,14 @@ let color = colors['green'];
 
 export class Drawer {
 
-  constructor(image, app) {
-    this.image = image;
+  constructor(app) {
     this.app = app;
+    this.image = this.app.currentImage;
 
     canvas.width = this.image.offsetWidth;
     canvas.height = this.image.offsetHeight;
-    canvas.style.left = '50%';
-    canvas.style.top = '50%';
-    canvas.style.position = 'absolute';
-    canvas.style.transform = 'translate(-50%, -50%)';
+    this.app.setElementPositionToCenter(canvas);
+    
     color = colors[this.app.currentColor];
 
     this.app.container.appendChild(canvas);
@@ -75,8 +73,8 @@ export class Drawer {
 
       mask.addEventListener('load', () => {
         canvas.toBlob(blob => {
-          this.app.uploadMask(blob);
-          this.clear();
+          this.app.uploadMask(blob)
+            .then(this.clear);
         });
       });
       mask.src = canvas.toDataURL();

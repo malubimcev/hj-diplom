@@ -138,22 +138,30 @@ export default class Application {
   }
 
   onFileUploaded(data) {
-    this.setImageSrc(data);
+    // this.setImageSrc(data);
+    this.setPageData(data);
+    this.createWebSocketConnection();
     this.setShareMode();
+  }
+  
+  setPageData(data) {
+    this.pageData = data;
+    this.imageId = this.pageData.id;   
   }
 
   setImageSrc(data) {
-    this.pageData = data;
-    this.imageId = this.pageData.id;
+    this.setPageData(data);
     this.currentImage.src = data.url;//будет выполнен обработчик onImageLoad()
   }
 
   onImageLoad(event) {
     this.imageLoader.style = 'display: none;';
     this.clearPage();
-
-    this.drawer = new Drawer(this.currentImage, this);
-
+    
+    if (!this.drawer) {
+      this.drawer = new Drawer(this);
+    }
+    
     if (!this.commentsContainer) {
       this.commentsContainer = new CommentsContainer(this);
     }
@@ -177,13 +185,20 @@ export default class Application {
   }
 
   uploadMask(img) {
-    this.connection.send(img);
+    return new Promise((resolve, reject) => {
+      this.connection.send(img);
+      resolve();
+    });
   }
 
   addMask(url) {
     const mask = createMask(this.currentImage);
     mask.addEventListener('load', () => this.currentImage.parentElement.insertBefore(mask, this.error));
     mask.src = url;
+  }
+
+  addComment(commentObj) {
+    this.commentsContainer.addComment(commentObj);
   }
 
   loadImageData() {
@@ -204,9 +219,16 @@ export default class Application {
     }
     if (this.pageData.comments) {
       for (const key in this.pageData.comments) {
-        this.commentsContainer.addComment(this.pageData.comments[key]);
+        this.addComment(this.pageData.comments[key]);
       }
     }
+  }
+  
+  setElementPositionToCenter(elem) {
+    elem.style.left = '50%';
+    elem.style.top = '50%';
+    elem.style.position = 'absolute';
+    elem.style.transform = 'translate(-50%, -50%)';
   }
 
 }//end class

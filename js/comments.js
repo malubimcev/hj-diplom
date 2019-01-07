@@ -118,7 +118,7 @@ class CommentBoard {
   }
 
   close() {
-    this.body.style = 'display: none;';
+    this.board.style = 'display: none;';
   }
 
   addComment(commentObj) {
@@ -138,10 +138,8 @@ export class CommentsContainer {
     app.container.insertBefore(this.container, app.error);
     this.container.style.width = `${app.currentImage.offsetWidth}px`;
     this.container.style.height = `${app.currentImage.offsetHeight}px`;
-    this.container.style.left = '50%';
-    this.container.style.top = '50%';
-    this.container.style.position = 'absolute';
-    this.container.style.transform = 'translate(-50%, -50%)';
+    this.app.setElementPositionToCenter(this.container);
+
     this.registerEvents();
   }
 
@@ -151,8 +149,8 @@ export class CommentsContainer {
   
   addBoard(coords) {
     const commentBoard = new CommentBoard(this.container, this.app);
-    commentBoard.board.style.left = `${coords.left - this.container.left}px`;
-    commentBoard.board.style.top = `${coords.top - this.container.top}px`;
+    commentBoard.board.style.left = `${coords.left}px`;
+    commentBoard.board.style.top = `${coords.top}px`;
     return commentBoard;
   }
   
