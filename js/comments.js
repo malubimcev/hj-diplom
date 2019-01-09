@@ -80,6 +80,7 @@ class CommentBoard {
     this.app = app;
     this.board.style.zIndex = container.style.zIndex + 1;
     container.appendChild(this.board);
+    this.marker = this.board.querySelector('.comments__marker');
     this.addButton = this.board.querySelector('.comments__submit');
     this.closeButton = this.board.querySelector('.comments__close');
     this.commentInput = this.board.querySelector('.comments__input');
@@ -119,6 +120,7 @@ class CommentBoard {
 
   close() {
     this.board.style = 'display: none;';
+    this.marker.style = 'display: none;';
   }
 
   addComment(commentObj) {
@@ -149,15 +151,16 @@ export class CommentsContainer {
   
   addBoard(coords) {
     const commentBoard = new CommentBoard(this.container, this.app);
-    commentBoard.board.style.left = `${coords.left}px`;
-    commentBoard.board.style.top = `${coords.top}px`;
+    commentBoard.board.style.left = `${Math.round(coords.left - this.container.getBoundingClientRect().left)}px`;
+    commentBoard.board.style.top = `${Math.round(coords.top - this.container.getBoundingClientRect().top)}px`;
     return commentBoard;
   }
   
   addComment(commentObj) {
-    commentObj.left += parseInt(this.container.style.left);
-    commentObj.top += parseInt(this.container.style.top);
+    commentObj.left += this.container.getBoundingClientRect().left;
+    commentObj.top += this.container.getBoundingClientRect().top;
     let elem = document.elementFromPoint(commentObj.left + 5, commentObj.top + 5);
+    console.log(`==${elem.className}==`);
     if (elem.className !== 'comments__body') {
       const form = this.addBoard({
         'left': commentObj.left,
