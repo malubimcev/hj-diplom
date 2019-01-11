@@ -51,7 +51,6 @@ export default class Application {
     this.imageId = window.location.search.slice(4);
     if (this.imageId) {
       this.createWebSocketConnection();
-      this.setCommentMode('on');
     } else {
       this.setPublicationMode();
     }
@@ -79,7 +78,7 @@ export default class Application {
   }
 
   setCommentMode(mode) {
-    this.commentsContainer.container.style.zIndex = parseInt(this.drawer.canvas.style.zIndex) + 1;
+    this.commentsContainer.container.style.zIndex = 2;
     this.commentsContainer.show(mode);
     this.menu.setCommentState();
     this.currentMode = 'comments';
@@ -167,7 +166,11 @@ export default class Application {
     }
 
     this.updatePage();
-    this.createWebSocketConnection();
+    if (this.isUpdated) {
+      this.setCommentMode('on');
+    } else {
+      this.createWebSocketConnection();
+    }
   }
 
   clearPage() {
@@ -202,6 +205,7 @@ export default class Application {
   }
 
   loadImageData() {
+    //вызывается из Socket при событии "pic"
     if (!this.isUpdated) {
       const loader = new FileLoader(this);
       loader.loadData('/pic/' + this.imageId)
