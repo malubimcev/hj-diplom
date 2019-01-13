@@ -222,9 +222,10 @@ export default class Application {
       this.addMask(this.pageData.mask);
     }
     if (this.pageData.comments) {
-      for (const key in this.pageData.comments) {
-        this.addComment(this.pageData.comments[key]);
-      }
+      // for (const key in this.pageData.comments) {
+      //   this.addComment(this.pageData.comments[key]);
+      // }
+      this.commentsContainer.addListOfComments(this.pageData.comments);
     }
   }
   

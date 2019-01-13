@@ -173,6 +173,12 @@ export class CommentsContainer {
     const refNode = elem.querySelector('.comment div');
     elem.insertBefore(comment, refNode.parentElement);
   }
+
+  addListOfComments(commentsList) {
+    for (const key in commentsList) {
+      this.addComment(commentsList[key]);
+    }
+  }
   
   removeAll() {
     const commentBoards = this.container.querySelectorAll('.comments__form');
