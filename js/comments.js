@@ -150,28 +150,31 @@ export class CommentsContainer {
   }
   
   addBoard(coords) {
-    const commentBoard = new CommentBoard(this.container, this.app);
-    commentBoard.board.style.left = `${Math.round(coords.left - this.container.getBoundingClientRect().left)}px`;
-    commentBoard.board.style.top = `${Math.round(coords.top - this.container.getBoundingClientRect().top)}px`;
-    return commentBoard;
+    return new Promise((resolve, reject) => {
+      const commentBoard = new CommentBoard(this.container, this.app);
+      commentBoard.board.style.left = `${Math.round(coords.left - this.container.getBoundingClientRect().left)}px`;
+      commentBoard.board.style.top = `${Math.round(coords.top - this.container.getBoundingClientRect().top)}px`;
+      return resolve(commentBoard);
+    });
   }
   
   addComment(commentObj) {
     commentObj.left += this.container.getBoundingClientRect().left;
     commentObj.top += this.container.getBoundingClientRect().top;
+    const comment = createComment(commentObj);
+
     let elem = document.elementFromPoint(commentObj.left + 5, commentObj.top + 5);
-    console.log(`==${elem.className}==`);
     if (elem.className !== 'comments__body') {
-      const form = this.addBoard({
+      this.addBoard({
         'left': commentObj.left,
         'top': commentObj.top
-      });
-      elem = form.board.querySelector('.comments__body');
+      })
+        .then(form => {
+          elem = form.board.querySelector('.comments__body');
+          const refNode = elem.querySelector('.comment div');
+          elem.insertBefore(comment, refNode.parentElement);
+        });
     }
-
-    const comment = createComment(commentObj);
-    const refNode = elem.querySelector('.comment div');
-    elem.insertBefore(comment, refNode.parentElement);
   }
 
   addListOfComments(commentsList) {

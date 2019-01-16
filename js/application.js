@@ -190,14 +190,16 @@ export default class Application {
   uploadMask(img) {
     return new Promise((resolve, reject) => {
       this.connection.send(img);
-      resolve();
+      return resolve();
     });
   }
 
   addMask(url) {
-    const mask = createMask(this.currentImage);
-    mask.addEventListener('load', () => this.currentImage.parentElement.insertBefore(mask, this.error));
-    mask.src = url;
+    createMask(this.currentImage)
+      .then((mask) => {
+        mask.addEventListener('load', () => this.currentImage.parentElement.insertBefore(mask, this.error));
+        mask.src = url;
+      });
   }
 
   addComment(commentObj) {

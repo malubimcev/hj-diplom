@@ -69,19 +69,26 @@ export class Drawer {
 
   newMask() {
     if (this.app.currentMode === 'draw') {
-      const mask = createMask(this.image);
-
-      mask.addEventListener('load', () => {
-        canvas.toBlob(blob => {
-          this.app.uploadMask(blob)
-            .then(this.clear);
+      createMask(this.image)
+        .then((mask) => {
+          mask.addEventListener('load', () => {
+            canvas.toBlob(blob => {
+              this.app.uploadMask(blob)
+                .then(() => this.clear())
+                .then(() => mask = null)
+                .catch(() => console.log('promise error'));
+            });
+          });
+          mask.src = canvas.toDataURL();
         });
-      });
-      mask.src = canvas.toDataURL();
     }
   }
 
   clear() {
+    const oldMasks = this.app.container.querySelectorAll('img.mask');
+    for (const mask of oldMasks) {
+      //mask.parentElement.removeChild(mask);
+    }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
@@ -92,14 +99,17 @@ export class Drawer {
 }//end class
 
 export function createMask(container) {
-  const mask = container.cloneNode();
-  mask.classList.add('mask');
-  mask.style.left = `${canvas.style.left}px`;
-  mask.style.top = `${canvas.style.top}px`;
-  mask.width = canvas.width;
-  mask.height = canvas.height;
-  canvas.style.zIndex = mask.style.zIndex + 1;
-  return mask;
+  return new Promise((resolve, reject) => {
+    const mask = document.createElement('img');
+    mask.classList.add('current-image');
+    mask.classList.add('mask');
+    mask.style.left = `${canvas.style.left}px`;
+    mask.style.top = `${canvas.style.top}px`;
+    mask.width = canvas.width;
+    mask.height = canvas.height;
+    canvas.style.zIndex = mask.style.zIndex + 1;
+    return resolve(mask);
+  });
 };
 
 function draw(point) {
