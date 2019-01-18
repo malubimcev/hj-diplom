@@ -74,8 +74,8 @@ export class Drawer {
           mask.addEventListener('load', () => {
             canvas.toBlob(blob => {
               this.app.uploadMask(blob)
-                .then(() => this.clear())
                 .then(() => mask = null)
+                .then(() => this.clear())
                 .catch(() => console.log('promise error'));
             });
           });
@@ -85,11 +85,11 @@ export class Drawer {
   }
 
   clear() {
-    const oldMasks = this.app.container.querySelectorAll('img.mask');
-    for (const mask of oldMasks) {
+    // const oldMasks = this.app.container.querySelectorAll('img.mask');
+    // for (const mask of oldMasks) {
       //mask.parentElement.removeChild(mask);
-    }
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // }
+    clearRect(0, 0, canvas.width, canvas.height);
   }
 
   setColor(colorName) {

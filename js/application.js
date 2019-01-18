@@ -16,7 +16,6 @@ export default class Application {
 
     this.imageLoader = container.querySelector('.image-loader');
     this.currentImage = container.querySelector('.current-image');
-    this.currentImageCoords = null;
 
     this.pageData = null;
     this.imageId = '';
@@ -137,10 +136,9 @@ export default class Application {
   }
 
   onFileUploaded(data) {
-    // this.setImageSrc(data);
     this.setPageData(data);
     this.createWebSocketConnection();
-    this.setShareMode();
+    setTimeout(this.setShareMode.bind(this), 2 * 1000);
   }
   
   setPageData(data) {
@@ -160,7 +158,7 @@ export default class Application {
     if (!this.drawer) {
       this.drawer = new Drawer(this);
     }
-    
+
     if (!this.commentsContainer) {
       this.commentsContainer = new CommentsContainer(this);
     }
@@ -219,7 +217,6 @@ export default class Application {
   }
 
   updatePage() {
-    this.currentImageCoords = this.currentImage.getBoundingClientRect();
     if (this.pageData.mask) {
       this.addMask(this.pageData.mask);
     }
