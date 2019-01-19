@@ -123,10 +123,10 @@ class CommentBoard {
     this.marker.style = 'display: none;';
   }
 
-  addComment(commentObj) {
-    const comment = createComment(commentObj);
-    this.body.insertBefore(comment, this.commentLoader);
-  }
+  // addComment(commentObj) {
+  //   const comment = createComment(commentObj);
+  //   this.body.insertBefore(comment, this.commentLoader);
+  // }
 
 }//end class CommentBoard
 
@@ -161,7 +161,7 @@ export class CommentsContainer {
   addComment(commentObj) {
     commentObj.left += this.container.getBoundingClientRect().left;
     commentObj.top += this.container.getBoundingClientRect().top;
-    
+
     const comment = createComment(commentObj);
 
     let elem = document.elementFromPoint(commentObj.left + 1, commentObj.top + 1);
@@ -176,7 +176,8 @@ export class CommentsContainer {
             .then(form => {
               elem = form.board.querySelector('.comments__body');
               return resolve();
-            });
+            })
+            .catch(err => console.log(`addBoard error: ${err}`));
         } else {
           return resolve();
         }
@@ -187,25 +188,29 @@ export class CommentsContainer {
       .then(() => {
           const refNode = elem.querySelector('.comment div');
           elem.insertBefore(comment, refNode.parentElement);        
-      });
-
-    // if (elem.className !== 'comments__body') {
-    //   this.addBoard({
-    //     'left': commentObj.left,
-    //     'top': commentObj.top
-    //   })
-    //     .then(form => {
-    //       elem = form.board.querySelector('.comments__body');
-    //       const refNode = elem.querySelector('.comment div');
-    //       elem.insertBefore(comment, refNode.parentElement);
-    //     });
-    // }
+      })
+      .catch(err => console.log(`checkForm error: ${err}`));
   }
 
   addListOfComments(commentsList) {
+    const commentObjects = [];
     for (const key in commentsList) {
-      this.addComment(commentsList[key]);
+      // this.addComment(commentsList[key]);
+      commentObjects.push(commentsList[key]);
     }
+    commentObjects.forEach(item => console.log(item));
+    commentObjects.reduce(
+      (p, i) => p.then(
+        () => new Promise(
+          (resolve, reject) => {
+            this.addComment(i);
+            resolve();
+          }
+        )
+      ),
+      Promise.resolve()
+    );
+
   }
   
   removeAll() {
