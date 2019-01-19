@@ -199,18 +199,7 @@ export class CommentsContainer {
       commentObjects.push(commentsList[key]);
     }
     commentObjects.forEach(item => console.log(item));
-    commentObjects.reduce(
-      (p, i) => p.then(
-        () => new Promise(
-          (resolve, reject) => {
-            this.addComment(i);
-            resolve();
-          }
-        )
-      ),
-      Promise.resolve()
-    );
-
+    commentObjects.reduce((promise, obj) => promise.then(this.addComment(obj))), Promise.resolve());
   }
   
   removeAll() {
