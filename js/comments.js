@@ -152,6 +152,9 @@ export class CommentsContainer {
   addBoard(coords) {
     return new Promise((resolve, reject) => {
       const commentBoard = new CommentBoard(this.container, this.app);
+      if (!commentBoard) {
+        return reject();
+      }
       commentBoard.board.style.left = `${Math.round(coords.left - this.container.getBoundingClientRect().left)}px`;
       commentBoard.board.style.top = `${Math.round(coords.top - this.container.getBoundingClientRect().top)}px`;
       return resolve(commentBoard);
@@ -164,7 +167,8 @@ export class CommentsContainer {
 
     const comment = createComment(commentObj);
 
-    let elem = document.elementFromPoint(commentObj.left + 1, commentObj.top + 1);
+    let elem = document.elementFromPoint(commentObj.left + 5, commentObj.top + 5);
+    console.log(`elem=${elem.className}`);
 
     const checkForm = () => {
       return new Promise((resolve, reject) => {
@@ -186,20 +190,26 @@ export class CommentsContainer {
 
     checkForm()
       .then(() => {
-          const refNode = elem.querySelector('.comment div');
-          elem.insertBefore(comment, refNode.parentElement);        
+        const refNode = elem.querySelector('.comment div');
+        elem.insertBefore(comment, refNode.parentElement);      
       })
       .catch(err => console.log(`checkForm error: ${err}`));
   }
 
   addListOfComments(commentsList) {
     const commentObjects = [];
+
+    const addCommentPromise = commentObj => {
+      return new Promise((resolve, reject) => {
+        this.addComment(commentObj);
+        return resolve();
+      });
+    }
+
     for (const key in commentsList) {
-      // this.addComment(commentsList[key]);
       commentObjects.push(commentsList[key]);
     }
-    commentObjects.forEach(item => console.log(item));
-    commentObjects.reduce((promise, obj) => promise.then(this.addComment(obj)), Promise.resolve());
+    commentObjects.reduce((promise, obj) => promise.then(this.addCommentPromise(obj)), Promise.resolve());
   }
   
   removeAll() {
