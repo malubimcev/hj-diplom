@@ -209,7 +209,9 @@ export class CommentsContainer {
     for (const key in commentsList) {
       commentObjects.push(commentsList[key]);
     }
-    commentObjects.reduce((promise, obj) => promise.then(addCommentPromise(obj)), Promise.resolve());
+    // commentObjects.reduce((promise, obj) => promise.then(addCommentPromise(obj)), Promise.resolve());
+    let action = Promise.resolve();
+    commentObjects.forEach(obj => action = action.then(addCommentPromise(obj)));
   }
   
   removeAll() {
