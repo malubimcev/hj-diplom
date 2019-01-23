@@ -3,9 +3,9 @@
 import Menu from "./menu.js";
 import FileLoader from "./loader.js";
 import WSConnection from "./socket.js";
-import CommentBoard from "./comments.js";
-import createComment from "./comments.js";
-import Drawer from "./drawer.js";
+import {CommentsContainer} from "./comments.js";
+import {Drawer} from "./drawer.js";
+import {createMask} from "./drawer.js";
 
 const FILE_TYPE_ERROR_MESSAGE = 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.';
 const DROP_ERROR_MESSAGE = 'Чтобы загрузить новое изображение, пожалуйста, воспользуйтесь пунктом "Загрузить новое" в меню.';
@@ -16,13 +16,13 @@ export default class Application {
 
     this.imageLoader = container.querySelector('.image-loader');
     this.currentImage = container.querySelector('.current-image');
+
+    this.pageData = null;
     this.imageId = '';
     this.currentColor = 'green';
     this.page = 'https://netology-code.github.io/hj-26-malubimcev/';
     this.isUpdated = false;
 
-    this.commentsForm = container.querySelector('.comments__form');
-    
     this.error = container.querySelector('.error');
     this.errorMessage = container.querySelector('.error__message');
 
@@ -30,9 +30,9 @@ export default class Application {
     this.drawer = null;
     this.currentMode = '';
     this.connection = null;
+    this.commentsContainer = null;
 
     this.registerEvents();
-    this.setPublicationMode();
   }
 
   registerEvents() {
@@ -41,19 +41,30 @@ export default class Application {
     ['dragenter', 'dragover', 'drop'].forEach(eventName => {
       this.container.addEventListener(eventName, event => event.preventDefault(), false);
     });
+
     this.container.addEventListener('drop', this.onDrop.bind(this), false);
+    this.currentImage.addEventListener('load', this.onImageLoad.bind(this), false);
   }
 
   onPageLoad() {
     this.imageId = window.location.search.slice(4);
     if (this.imageId) {
-      this.loadImage();
-      this.setCommentMode('on');
+      this.createWebSocketConnection();
+    } else {
+      this.setPublicationMode();
+    }
+  }
+
+  createWebSocketConnection() {
+    if (!this.connection) {
+      this.connection = new WSConnection(this);
     }
   }
 
   setPublicationMode() {
     this.currentImage.src = '';
+    this.drawer = null;
+    this.commentsContainer = null;
     this.menu.setPublicationState();
     this.currentMode = 'publication';
   }
@@ -61,56 +72,20 @@ export default class Application {
   setShareMode() {
     const id = this.imageId ? ('?id=' + this.imageId) : '';
     this.menu.linkField.value = this.page + id;
-    this.menu.setEditState();
     this.menu.setShareState();
     this.currentMode = 'share';
   }
 
   setCommentMode(mode) {
-    const display = mode === 'on' ? 'visibility: visible; z-index: 999;' : 'visibility: hidden; z-index: 0;';
-    const markers = this.container.querySelectorAll('.comments__marker');
-    const bodys = this.container.querySelectorAll('.comments__body');
-    const inputs = this.container.querySelectorAll('.comments__marker-checkbox');
-    for (const marker of markers) {
-      marker.style = display;
-    }
-    for (const body of bodys) {
-      body.style = display;
-    }
-    for (const inp of inputs) {
-      inp.style = display;
-      inp.style.zIndex = 9999;
-    }
-    this.menu.setEditState();
+    this.commentsContainer.container.style.zIndex = 2;
+    this.commentsContainer.show(mode);
     this.menu.setCommentState();
     this.currentMode = 'comments';
   }
 
-  addCommentBoard(event) {
-    const left = event.pageX;
-    const top = event.pageY;
-    const commentBoard = new CommentBoard(null, this);
-    commentBoard.board.style.left = `${left}px`;
-    commentBoard.board.style.top = `${top}px`;
-    this.container.appendChild(commentBoard.board);
-  }
-
-  addComment(commentObj) {
-    const elem = document.elementFromPoint(commentObj.left, commentObj.top);
-    // console.log(elem.className);
-    const comment = createComment(commentObj);
-    elem.parentElement.insertBefore(comment, elem);
-  }
-
   setDrawMode() {
+    this.commentsContainer.container.style.zIndex = 0;
     this.currentMode = 'draw';
-  }
-
-  setColor(colorName) {
-    this.currentColor = colorName;
-    if (this.drawer) {
-      this.drawer.setColor(this.currentColor);
-    }
   }
 
   setErrorMode(errMessage) {
@@ -118,6 +93,13 @@ export default class Application {
     this.imageLoader.style = 'display: none;';
     this.error.style = 'display: block;';
     this.errorMessage.textContent = errMessage;
+  }
+
+  setColor(colorName) {
+    this.currentColor = colorName;
+    if (this.drawer) {
+      this.drawer.setColor(this.currentColor);
+    }
   }
 
   selectFile() {
@@ -154,58 +136,100 @@ export default class Application {
   }
 
   onFileUploaded(data) {
-    this.updatePage(data);
-    this.currentImage.addEventListener('load', (event) => {
-      this.drawer = new Drawer(this.currentImage, this);
-    });
-    this.currentImage.src = data.url;
-    this.imageLoader.style = 'display: none;';
-    this.connection = new WSConnection(this);
-    this.setShareMode();
+    this.setPageData(data);
+    this.createWebSocketConnection();
+    setTimeout(this.setShareMode.bind(this), 2 * 1000);
+  }
+  
+  setPageData(data) {
+    this.pageData = data;
+    this.imageId = this.pageData.id;   
   }
 
-  onClick(event) {
-    if (this.currentMode === 'comments') {
-      this.addCommentBoard(event);
+  setImageSrc(data) {
+    this.setPageData(data);
+    this.currentImage.src = data.url;//будет выполнен обработчик onImageLoad()
+  }
+
+  onImageLoad(event) {
+    this.imageLoader.style = 'display: none;';
+    this.clearPage();
+    
+    if (!this.drawer) {
+      this.drawer = new Drawer(this);
+    }
+
+    if (!this.commentsContainer) {
+      this.commentsContainer = new CommentsContainer(this);
+    }
+
+    this.updatePage();
+    if (this.isUpdated) {
+      this.setCommentMode('on');
+    } else {
+      this.createWebSocketConnection();
+    }
+  }
+
+  clearPage() {
+    if (this.drawer) {
+      const masks = this.container.querySelectorAll('.mask');
+      for (const mask of masks) {
+        this.container.removeChild(mask);
+      }
+      this.drawer = null;
+    }
+    if (this.commentsContainer) {
+      this.commentsContainer.removeAll();
+      this.commentsContainer = null;
     }
   }
 
   uploadMask(img) {
-    this.connection.send(img);
+    return new Promise((resolve, reject) => {
+      this.connection.send(img);
+      return resolve();
+    });
   }
 
   addMask(url) {
-    const mask = this.currentImage.cloneNode();
-    mask.style.left = this.currentImage.style.left;
-    mask.style.top = this.currentImage.style.top;
-    mask.width = this.currentImage.width;
-    mask.height = this.currentImage.height;
-    mask.style.zIndex = this.currentImage.style.zIndex + 1;
-    mask.addEventListener('load', this.currentImage.appendChild(mask));
-    mask.src = url;
+    createMask(this.currentImage)
+      .then((mask) => {
+        mask.addEventListener('load', () => this.currentImage.parentElement.insertBefore(mask, this.error));
+        mask.src = url;
+      });
   }
 
-  loadImage() {
+  addComment(commentObj) {
+    this.commentsContainer.addComment(commentObj);
+  }
+
+  loadImageData() {
+    //вызывается из Socket при событии "pic"
     if (!this.isUpdated) {
       const loader = new FileLoader(this);
       loader.loadData('/pic/' + this.imageId)
-        .then(Data => {
-          this.onFileUploaded.bind(this);
+        .then(data => {
+          this.setImageSrc(data);
           this.isUpdated = true;
         });
     }
   }
 
-  updatePage(data) {
-    this.imageId = data.id;
-    if (data.mask) {
-      this.addMask(data.mask);
+  updatePage() {
+    if (this.pageData.mask) {
+      this.addMask(this.pageData.mask);
     }
-    if (data.comments) {
-      for (const comment in data.comments) {
-        this.addComment(comment);
-      }
+    if (this.pageData.comments) {
+      this.commentsContainer.addListOfComments(this.pageData.comments);
     }
   }
+  
+  setElementPositionToCenter(elem) {
+    elem.style.left = '50%';
+    elem.style.top = '50%';
+    elem.style.position = 'absolute';
+    elem.style.transform = 'translate(-50%, -50%)';
+  }
 
-}
+}//end class

@@ -53,10 +53,11 @@ function createBoard() {
   return form;
 }
 
-export function createComment(commentInfo) {
-  const time = document.createElement('p');
-  time.classList.add('comment__time');
-  time.textContent = commentInfo.timestamp;
+function createComment(commentInfo) {
+  const timestamp = document.createElement('p');
+  timestamp.classList.add('comment__time');
+  const date = new Date(commentInfo.timestamp);
+  timestamp.textContent = date.toLocaleString('ru-RU');
 
   const message = document.createElement('p');
   message.classList.add('comment__message');
@@ -65,7 +66,7 @@ export function createComment(commentInfo) {
   const comment = document.createElement('div');
   comment.classList.add('comment');
 
-  comment.appendChild(time);
+  comment.appendChild(timestamp);
   comment.appendChild(message);
   comment.style.left = commentInfo.left;
   comment.style.top = commentInfo.top;
@@ -73,14 +74,13 @@ export function createComment(commentInfo) {
   return comment;
 }
 
-export default class CommentBoard {
+class CommentBoard {
   constructor(container, app) {
-    if (container) {
-      this.board = container;
-    } else {
-      this.board = createBoard();
-    }
+    this.board = createBoard();
     this.app = app;
+    this.board.style.zIndex = container.style.zIndex + 1;
+    container.appendChild(this.board);
+    this.marker = this.board.querySelector('.comments__marker');
     this.addButton = this.board.querySelector('.comments__submit');
     this.closeButton = this.board.querySelector('.comments__close');
     this.commentInput = this.board.querySelector('.comments__input');
@@ -91,34 +91,157 @@ export default class CommentBoard {
   }
 
   registerEvents() {
-    this.closeButton.addEventListener('click', this.close.bind(this));
-    this.addButton.addEventListener('click', this.sendComment.bind(this));
+    this.closeButton.addEventListener('click', this.close.bind(this), false);
+    this.addButton.addEventListener('click', this.sendComment.bind(this), false);
   }
 
   sendComment(event) {
   	event.preventDefault();
-    const formData = new FormData(this.board);
-    formData.append('left', this.commentInput.style.left);
-    formData.append('top', this.commentInput.style.top);
-    formData.append('message', this.commentInput.textContent);
+    const commentInfoObj = {
+    	'left': parseInt(this.board.style.left),
+    	'top': parseInt(this.board.style.top),
+    	'message': this.commentInput.value
+    }
+    this.commentInput.value = '';
+    let props = [];
+    for (const key in commentInfoObj) {
+    	props.push(key + '=' + commentInfoObj[key]);
+    }
+    const requestString = props.join('&');
 
-    const loader = new FileLoader(this.app);
+    const fileLoader = new FileLoader(this.app);
     const url = '/pic/' + this.app.imageId + '/comments';
     this.commentLoader.classList.add('loader');
 
-    loader.sendForm(formData, url, (data) => {
+    fileLoader.sendForm(requestString, url, (data) => {
     	this.commentLoader.classList.remove('loader');
-    	this.app.updatePage(data);
     });
   }
 
   close() {
-    this.body.style = 'display: none;';
+    this.board.style = 'display: none;';
+    this.marker.style = 'display: none;';
   }
 
+  // addComment(commentObj) {
+  //   const comment = createComment(commentObj);
+  //   this.body.insertBefore(comment, this.commentLoader);
+  // }
+
+}//end class CommentBoard
+
+export class CommentsContainer {
+
+  constructor(app) {
+    this.app = app;
+    this.container = document.createElement('div');
+    this.container.classList.add('comments-container');
+
+    app.container.insertBefore(this.container, app.error);
+    this.container.style.width = `${app.currentImage.offsetWidth}px`;
+    this.container.style.height = `${app.currentImage.offsetHeight}px`;
+    this.app.setElementPositionToCenter(this.container);
+
+    this.registerEvents();
+  }
+
+  registerEvents() {
+    this.container.addEventListener('click', this.onClick.bind(this), false);
+  }
+  
+  addBoard(coords) {
+    return new Promise((resolve, reject) => {
+      const commentBoard = new CommentBoard(this.container, this.app);
+      if (!commentBoard) {
+        return reject();
+      }
+      commentBoard.board.style.left = `${Math.round(coords.left - this.container.getBoundingClientRect().left)}px`;
+      commentBoard.board.style.top = `${Math.round(coords.top - this.container.getBoundingClientRect().top)}px`;
+      return resolve(commentBoard);
+    });
+  }
+  
   addComment(commentObj) {
+    commentObj.left += this.container.getBoundingClientRect().left;
+    commentObj.top += this.container.getBoundingClientRect().top;
+
     const comment = createComment(commentObj);
-    this.body.insertBefore(comment, this.commentLoader);
+
+    let elem = document.elementFromPoint(commentObj.left + 5, commentObj.top + 5);
+    console.log(`elem=${elem.className}`);
+
+    const checkForm = () => {
+      return new Promise((resolve, reject) => {
+        if (elem.className !== 'comments__body') {
+          this.addBoard({
+            'left': commentObj.left,
+            'top': commentObj.top
+          })
+            .then(form => {
+              elem = form.board.querySelector('.comments__body');
+              return resolve();
+            })
+            .catch(err => console.log(`addBoard error: ${err}`));
+        } else {
+          return resolve();
+        }
+      })
+    }
+
+    checkForm()
+      .then(() => {
+        const refNode = elem.querySelector('.comment div');
+        elem.insertBefore(comment, refNode.parentElement);      
+      })
+      .catch(err => console.log(`checkForm error: ${err}`));
   }
 
-}
+  addListOfComments(commentsList) {
+    const commentObjects = [];
+
+    const addCommentPromise = commentObj => {
+      return new Promise((resolve, reject) => {
+        this.addComment(commentObj);
+        return resolve();
+      });
+    }
+
+    for (const key in commentsList) {
+      commentObjects.push(commentsList[key]);
+    }
+    // commentObjects.reduce((promise, obj) => promise.then(addCommentPromise(obj)), Promise.resolve());
+    let action = Promise.resolve();
+    commentObjects.forEach(obj => action = action.then(addCommentPromise(obj)));
+  }
+  
+  removeAll() {
+    const commentBoards = this.container.querySelectorAll('.comments__form');
+    for (const board of commentBoards) {
+      this.container.removeChild(board);
+    }
+    this.app.container.removeChild(this.container);
+  }
+
+  onClick(event) {
+    if (this.app.currentMode === 'comments') {
+      if (event.target.className === 'comments-container') {
+        this.addBoard({
+          'left': event.pageX,
+          'top': event.pageY
+        });
+      }
+    }
+  }
+
+  show(mode) {
+    const forms = this.container.querySelectorAll('.comments__form');
+    const formElements = this.container.querySelectorAll('.comments__form *');
+    for (const frm of forms) {
+      frm.style.zIndex = mode === 'on' ? 2 : 0;
+    }
+    for (const elem of formElements) {
+      elem.style = mode === 'on' ? 'visibility: visible;' : 'visibility: hidden;';
+    }
+  }
+
+}//end class CommentsContainer

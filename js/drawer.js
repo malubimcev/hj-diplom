@@ -3,8 +3,11 @@
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
 const BRUSH_RADIUS = 4;
-let needsRepaint = true;
-let lines = [];
+const MASK_DELAY = 1000;// Задержка создания и отправки маски:
+// в течение этого периода пользователь может продолжить рисовать (со сбросом таймера),
+// после окончания периода задержки происходит формирование и отправка маски на сервер.
+let timeout;// Таймер для задержки отправки маски.
+let isDrawing = false;
 const colors = {
   'red': '#EA5D56',
   'yellow': '#F3D135',
@@ -14,74 +17,79 @@ const colors = {
 };
 let color = colors['green'];
 
-export default class Drawer {
+export class Drawer {
 
-  constructor(image, app) {
-    this.image = image;
+  constructor(app) {
     this.app = app;
+    this.image = this.app.currentImage;
 
     canvas.width = this.image.offsetWidth;
     canvas.height = this.image.offsetHeight;
-    canvas.style.left = '50%';
-    canvas.style.top = '50%';
-    canvas.style.position = 'absolute';
-    canvas.style.transform = 'translate(-50%, -50%)';
+    this.app.setElementPositionToCenter(canvas);
+    
     color = colors[this.app.currentColor];
 
-    document.querySelector('.app').appendChild(canvas);
+    this.app.container.appendChild(canvas);
+    this.canvas = canvas;
     
-    this.drawing = false;
-
     this.registerEvents();
   }
 
   registerEvents() {
     canvas.addEventListener('mousedown', (event) => {
+      clearTimeout(timeout);
       if (this.app.currentMode === 'draw') {
-        this.drawing = true;
-        const line = [];
-        line.push([event.offsetX, event.offsetY]);
-        lines.push(line);
-        needsRepaint = true;
+        const point = [event.offsetX, event.offsetY];
+        ctx.lineWidth = BRUSH_RADIUS;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = color;
+        ctx.moveTo(...point);     
+        ctx.beginPath();
+        isDrawing = true;
       }
     });
 
     canvas.addEventListener('mousemove', (event) => {
-      if (this.app.currentMode === 'draw' && this.drawing) {
+      if (this.app.currentMode === 'draw' && isDrawing) {
         const point = [event.offsetX, event.offsetY];
-        lines[lines.length - 1].push(point);
-        needsRepaint = true;
+        draw(point);
       }
       tick();
     });
 
-    ['mouseup', 'mouseleave'].forEach(evName => canvas.addEventListener(evName, () => this.drawing = false));
+    ['mouseup', 'mouseleave'].forEach(evName => canvas.addEventListener(evName, () => isDrawing = false));
     
-    canvas.addEventListener('mouseup', this.newMask.bind(this), false);
-    canvas.addEventListener('click', this.app.onClick.bind(this.app), false);
+    canvas.addEventListener('mouseup', this.onMouseUp.bind(this), false);
+  }
+
+  onMouseUp() {
+    debounce(this.newMask.bind(this), MASK_DELAY);
   }
 
   newMask() {
     if (this.app.currentMode === 'draw') {
-      const mask = createMask(this.image);
-      const node = this.app.container.querySelector('.error');
-
-      mask.addEventListener('load', () => {
-        this.app.container.insertBefore(mask, node);
-        canvas.toBlob(blob => this.app.uploadMask(blob));
-        this.clear();
-      });
-      mask.src = canvas.toDataURL();
+      createMask(this.image)
+        .then((mask) => {
+          mask.addEventListener('load', () => {
+            canvas.toBlob(blob => {
+              this.app.uploadMask(blob)
+                .then(() => mask = null)
+                .then(() => this.clear())
+                .catch(() => console.log('promise error'));
+            });
+          });
+          mask.src = canvas.toDataURL();
+        });
     }
   }
 
-  removeCanvas() {
-    document.querySelector('.app').removeChild(canvas);
-  }
-
   clear() {
-    lines = [];
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // const oldMasks = this.app.container.querySelectorAll('img.mask');
+    // for (const mask of oldMasks) {
+      //mask.parentElement.removeChild(mask);
+    // }
+    clearRect(0, 0, canvas.width, canvas.height);
   }
 
   setColor(colorName) {
@@ -90,56 +98,34 @@ export default class Drawer {
 
 }//end class
 
-function createMask(container) {
-  const mask = container.cloneNode();
-  mask.style.left = canvas.style.left;
-  mask.style.top = canvas.style.top;
-  mask.width = canvas.width;
-  mask.height = canvas.height;
-  mask.style.zIndex = container.style.zIndex + 1;
-  canvas.style.zIndex = mask.style.zIndex + 1;
-  return mask;
+export function createMask(container) {
+  return new Promise((resolve, reject) => {
+    const mask = document.createElement('img');
+    mask.classList.add('current-image');
+    mask.classList.add('mask');
+    mask.style.left = `${canvas.style.left}px`;
+    mask.style.top = `${canvas.style.top}px`;
+    mask.width = canvas.width;
+    mask.height = canvas.height;
+    canvas.style.zIndex = mask.style.zIndex + 1;
+    return resolve(mask);
+  });
 };
 
-function circle(point) {
-  ctx.beginPath();
-  ctx.arc(...point, BRUSH_RADIUS / 2, 0, 2 * Math.PI);
-  ctx.fillStyle = color;
-  ctx.fill();
-}
-
-function lineBetween (p1, p2) {
-  ctx.moveTo(...p1);
-  ctx.lineTo(...p2);
-}
-
-function drawLine(points) {
-  ctx.beginPath();
-  ctx.lineWidth = BRUSH_RADIUS;
-  ctx.lineJoin = 'round';
-  ctx.lineCap = 'round';
-  ctx.strokeStyle = color;
-
-  ctx.moveTo(...points[0]);
-  for(let i = 1; i < points.length - 1; i++) {
-    lineBetween(points[i], points[i + 1]);
-  }
+function draw(point) {
+  ctx.lineTo(...point);
   ctx.stroke();
+  ctx.moveTo(...point);
 }
 
-function repaint () {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  lines
-    .forEach((line) => {
-      circle(line[0]);
-      drawLine(line);
-    });
-}
-
-function tick () {
-  if(needsRepaint) {
-    repaint();
-    needsRepaint = false;
-  }
+function tick() {
   window.requestAnimationFrame(tick);
 }
+
+function debounce(callback,  delay) {
+  clearTimeout(timeout);
+  timeout = setTimeout(() => {
+    timeout = null;
+    callback();
+  }, delay);
+};

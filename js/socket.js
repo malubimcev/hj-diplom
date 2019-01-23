@@ -1,7 +1,5 @@
 'use strict';
 
-const SEND_DELAY = 1000;//задержка отправки маск
-
 export default class WSConnection {
   constructor(app) {
     this.app = app;
@@ -12,19 +10,17 @@ export default class WSConnection {
 
   registerEvents() {
     this.ws.addEventListener('message', this.onMessage.bind(this));
-    // this.ws.addEventListener('open', () => console.log('ws connected'));
     this.ws.addEventListener('close', () => console.log('ws closed'));
-    this.ws.addEventListener('error', (err) => console.log(`ws error: ${error.data}`));
+    this.ws.addEventListener('error', (err) => console.log(`ws message error: ${error.data}`));
     window.addEventListener('beforeUnload', () => this.ws.close(1000));
   }
 
   onMessage(event) {
-    // console.log(`ws.event.data=${event.data}`);
     try {
       const msg = JSON.parse(event.data);
       switch(msg.event) {
         case 'pic':
-          this.app.loadImage();
+          this.app.loadImageData();
           break;
         case 'comment':
           this.app.addComment(msg.comment);
@@ -33,7 +29,7 @@ export default class WSConnection {
           this.app.addMask(msg.url);
           break;
         case 'error':
-          console.log(`ws error: ${msg.message}`);
+          console.log(`ws event error: ${msg.message}`);
           break;
       }
     } catch (err) {
@@ -42,7 +38,7 @@ export default class WSConnection {
   }
 
   send(msg) {
-    setTimeout(() => this.ws.send(msg), SEND_DELAY);
+    this.ws.send(msg);
   }
 
 }//end class
