@@ -179,6 +179,7 @@ export class CommentsContainer {
           })
             .then(form => {
               elem = form.board.querySelector('.comments__body');
+              console.log('addBoard.then');
               return resolve();
             })
             .catch(err => console.log(`addBoard error: ${err}`));
@@ -208,7 +209,6 @@ export class CommentsContainer {
     // }
 
     const addCommentPromise = async (commentObj) => {
-      console.log('before await');
       console.log(commentObj.left);
       await this.addComment(commentObj);
       console.log('after await');
@@ -221,9 +221,7 @@ export class CommentsContainer {
     let action = Promise.resolve();
     // commentObjects.forEach(obj => action = action.then(addCommentPromise(obj)));
     commentObjects.forEach(obj => {
-      console.log('before async');
       addCommentPromise(obj);
-      console.log('after async');
     });
   }
   
