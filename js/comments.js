@@ -191,7 +191,8 @@ export class CommentsContainer {
     checkForm()
       .then(() => {
         const refNode = elem.querySelector('.comment div');
-        elem.insertBefore(comment, refNode.parentElement);      
+        elem.insertBefore(comment, refNode.parentElement);
+        console.log('checkForm.then');
       })
       .catch(err => console.log(`checkForm error: ${err}`));
   }
@@ -207,7 +208,10 @@ export class CommentsContainer {
     // }
 
     const addCommentPromise = async (commentObj) => {
+      console.log('before await');
+      console.log(commentObj.left);
       await this.addComment(commentObj);
+      console.log('after await');
     }
 
     for (const key in commentsList) {
@@ -216,7 +220,11 @@ export class CommentsContainer {
     // commentObjects.reduce((promise, obj) => promise.then(addCommentPromise(obj)), Promise.resolve());
     let action = Promise.resolve();
     // commentObjects.forEach(obj => action = action.then(addCommentPromise(obj)));
-    commentObjects.forEach(obj => addCommentPromise(obj));
+    commentObjects.forEach(obj => {
+      console.log('before async');
+      addCommentPromise(obj);
+      console.log('after async');
+    });
   }
   
   removeAll() {
