@@ -171,6 +171,7 @@ export default class Application {
     } else {
       this.createWebSocketConnection();
     }
+    this.updatePage();
   }
 
   clearPage() {
