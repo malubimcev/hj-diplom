@@ -167,7 +167,7 @@ export class CommentsContainer {
 
     const comment = createComment(commentObj);
 
-    let elem = document.elementFromPoint(commentObj.left + 5, commentObj.top + 5);
+    let elem = document.elementFromPoint(commentObj.left + 0, commentObj.top + 0);
     console.log(`elem=${elem.className}`);
 
     const checkForm = () => {
@@ -218,7 +218,7 @@ export class CommentsContainer {
       commentObjects.push(commentsList[key]);
     }
     // commentObjects.reduce((promise, obj) => promise.then(addCommentPromise(obj)), Promise.resolve());
-    let action = Promise.resolve();
+    // let action = Promise.resolve();
     // commentObjects.forEach(obj => action = action.then(addCommentPromise(obj)));
     commentObjects.forEach(obj => {
       addCommentPromise(obj);
