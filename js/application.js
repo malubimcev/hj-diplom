@@ -165,7 +165,7 @@ export default class Application {
       this.commentsContainer = new CommentsContainer(this);
     }
 
-    this.updatePage();
+    // this.updatePage();
     if (this.isUpdated) {
       this.setCommentMode('on');
     } else {
