@@ -162,8 +162,8 @@ export class CommentsContainer {
   }
   
   addComment(commentObj) {
-    //commentObj.left += this.container.getBoundingClientRect().left;
-    // commentObj.top += this.container.getBoundingClientRect().top;
+    commentObj.left += this.container.getBoundingClientRect().left;
+    commentObj.top += this.container.getBoundingClientRect().top;
 
     const comment = createComment(commentObj);
 
