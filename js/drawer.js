@@ -107,7 +107,7 @@ export function createMask(container) {
     mask.style.top = `${canvas.style.top}px`;
     mask.width = canvas.width;
     mask.height = canvas.height;
-    canvas.style.zIndex = mask.style.zIndex + 1;
+    // canvas.style.zIndex = mask.style.zIndex + 1;
     return resolve(mask);
   });
 };
