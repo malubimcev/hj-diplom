@@ -77,14 +77,16 @@ export default class Application {
   }
 
   setCommentMode(mode) {
-    this.commentsContainer.container.style.zIndex = 2;
+    // this.commentsContainer.container.style.zIndex = 2;
+    this.container.appendChild(this.commentsContainer.container);
     this.commentsContainer.show(mode);
     this.menu.setCommentState();
     this.currentMode = 'comments';
   }
 
   setDrawMode() {
-    this.commentsContainer.container.style.zIndex = 0;
+    // this.commentsContainer.container.style.zIndex = 0;
+    this.container.appendChild(this.drawer.canvas);
     this.currentMode = 'draw';
   }
 
