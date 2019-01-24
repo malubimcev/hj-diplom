@@ -168,7 +168,7 @@ export class CommentsContainer {
     const comment = createComment(commentObj);
 
     let elem = document.elementFromPoint(commentObj.left + 0, commentObj.top + 0);
-    console.log(`elem=${elem.className}`);
+    console.log(`elem=${elem.tagName}.${elem.className}`);
 
     const checkForm = () => {
       return new Promise((resolve, reject) => {
