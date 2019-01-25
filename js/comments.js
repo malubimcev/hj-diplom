@@ -123,11 +123,6 @@ class CommentBoard {
     this.marker.style = 'display: none;';
   }
 
-  // addComment(commentObj) {
-  //   const comment = createComment(commentObj);
-  //   this.body.insertBefore(comment, this.commentLoader);
-  // }
-
 }//end class CommentBoard
 
 export class CommentsContainer {

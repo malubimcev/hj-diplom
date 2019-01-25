@@ -77,7 +77,6 @@ export default class Application {
   }
 
   setCommentMode(mode) {
-    // this.commentsContainer.container.style.zIndex = 2;
     this.container.appendChild(this.commentsContainer.container);
     this.commentsContainer.show(mode);
     this.menu.setCommentState();
@@ -85,7 +84,6 @@ export default class Application {
   }
 
   setDrawMode() {
-    // this.commentsContainer.container.style.zIndex = 0;
     this.container.appendChild(this.drawer.canvas);
     this.currentMode = 'draw';
   }
@@ -165,7 +163,6 @@ export default class Application {
       this.commentsContainer = new CommentsContainer(this);
     }
 
-    // this.updatePage();
     if (this.isUpdated) {
       this.setCommentMode('on');
     } else {
