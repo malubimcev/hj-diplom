@@ -113,7 +113,7 @@ export default class Application {
   onDrop(event) {
     const file = event.dataTransfer.files[0];
     const fileType = /^image\//;
-    if (this.currentMode === 'publication') {
+    if (this.currentMode === 'publication' && !this.isUpdated) {
       if (file && file.type.match(fileType)) {
         this.uploadFile(file);
       } else {
@@ -137,6 +137,7 @@ export default class Application {
 
   onFileUploaded(data) {
     this.setPageData(data);
+    this.connection = null;
     this.createWebSocketConnection();
     setTimeout(this.setShareMode.bind(this), 2 * 1000);
   }

@@ -74,7 +74,7 @@ export class Drawer {
           mask.addEventListener('load', () => {
             canvas.toBlob(blob => {
               this.app.uploadMask(blob)
-                .then(() => mask = null)
+                // .then(() => mask = null)
                 .then(() => this.clear())
                 .catch(() => console.log('promise error'));
             });

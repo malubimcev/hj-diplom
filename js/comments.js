@@ -229,6 +229,7 @@ export class CommentsContainer {
   }
 
   onClick(event) {
+    console.log(`click at: ${event.pageX}:${event.pageY}`)
     if (this.app.currentMode === 'comments') {
       if (event.target.className === 'comments-container') {
         this.addBoard({
