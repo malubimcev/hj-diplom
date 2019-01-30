@@ -203,11 +203,11 @@ export class CommentsContainer {
     //   });
     // }
 
-    // const addCommentPromise = async (commentObj) => {
-    //   console.log(commentObj.left);
-    //   await this.addComment(commentObj);
-    //   console.log('after await');
-    // }
+    const addCommentPromise = async (commentObj) => {
+      console.log(commentObj.left);
+      await this.addComment(commentObj);
+      console.log('after await');
+    }
 
     for (const key in commentsList) {
       commentObjects.push(commentsList[key]);
@@ -226,7 +226,7 @@ export class CommentsContainer {
     // commentObjects.forEach(obj => action = action.then(addCommentPromise(obj)));
 
     commentObjects.forEach(obj => {
-      addComment(obj);
+      this.addComment(obj);
     });
   }
   
