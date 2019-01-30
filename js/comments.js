@@ -226,7 +226,7 @@ export class CommentsContainer {
     // commentObjects.forEach(obj => action = action.then(addCommentPromise(obj)));
 
     commentObjects.forEach(obj => {
-      addCommentPromise(obj);
+      addComment(obj);
     });
   }
   
