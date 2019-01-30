@@ -203,18 +203,28 @@ export class CommentsContainer {
     //   });
     // }
 
-    const addCommentPromise = async (commentObj) => {
-      console.log(commentObj.left);
-      await this.addComment(commentObj);
-      console.log('after await');
-    }
+    // const addCommentPromise = async (commentObj) => {
+    //   console.log(commentObj.left);
+    //   await this.addComment(commentObj);
+    //   console.log('after await');
+    // }
 
     for (const key in commentsList) {
       commentObjects.push(commentsList[key]);
     }
+    const commentCoords = commentObjects.map(obj => `${obj.left}:${obj.top}`);
+    const formCoords = [...new Set(commentCoords)];
+    formCoords
+      .map(coord => [...coord.split(':')])
+      .forEach(coord => this.addBoard({
+        'left': coord[0],
+        'top': coord[1]
+      }));
+
     // commentObjects.reduce((promise, obj) => promise.then(addCommentPromise(obj)), Promise.resolve());
     // let action = Promise.resolve();
     // commentObjects.forEach(obj => action = action.then(addCommentPromise(obj)));
+
     commentObjects.forEach(obj => {
       addCommentPromise(obj);
     });

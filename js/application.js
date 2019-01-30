@@ -194,6 +194,7 @@ export default class Application {
   }
 
   addMask(url) {
+    //вызывается из Socket при событии "mask"
     createMask(this.currentImage)
       .then((mask) => {
         mask.addEventListener('load', () => {
@@ -206,6 +207,7 @@ export default class Application {
   }
 
   addComment(commentObj) {
+    //вызывается из Socket при событии "comment"
     this.commentsContainer.addComment(commentObj);
   }
 
