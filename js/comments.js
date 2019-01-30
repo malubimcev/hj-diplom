@@ -207,8 +207,8 @@ export class CommentsContainer {
       .map(coord => [...coord.split(':')])
       .forEach(coord => console.log(coord))
       .forEach(coord => this.addBoard({
-        'left': coord[0],
-        'top': coord[1]
+        'left': +coord[0],
+        'top': +coord[1]
       }));
 
     commentObjects.forEach(obj => {
