@@ -162,7 +162,7 @@ export class CommentsContainer {
 
     const comment = createComment(commentObj);
 
-    let elem = document.elementFromPoint(commentObj.left + 1, commentObj.top + 5);
+    let elem = document.elementFromPoint(commentObj.left + 1, commentObj.top + 1);
     console.log(`elem=${elem.tagName}.${elem.className}`);
 
     const checkForm = () => {
@@ -196,34 +196,20 @@ export class CommentsContainer {
   addListOfComments(commentsList) {
     const commentObjects = [];
 
-    // const addCommentPromise = commentObj => {
-    //   return new Promise((resolve, reject) => {
-    //     this.addComment(commentObj);
-    //     return resolve();
-    //   });
-    // }
-
-    const addCommentPromise = async (commentObj) => {
-      console.log(commentObj.left);
-      await this.addComment(commentObj);
-      console.log('after await');
-    }
-
     for (const key in commentsList) {
       commentObjects.push(commentsList[key]);
     }
     const commentCoords = commentObjects.map(obj => `${obj.left}:${obj.top}`);
+    console.log(formCoords);
     const formCoords = [...new Set(commentCoords)];
+    console.log(formCoords);
     formCoords
       .map(coord => [...coord.split(':')])
+      .forEach(coord => console.log(coord))
       .forEach(coord => this.addBoard({
         'left': coord[0],
         'top': coord[1]
       }));
-
-    // commentObjects.reduce((promise, obj) => promise.then(addCommentPromise(obj)), Promise.resolve());
-    // let action = Promise.resolve();
-    // commentObjects.forEach(obj => action = action.then(addCommentPromise(obj)));
 
     commentObjects.forEach(obj => {
       this.addComment(obj);
