@@ -200,7 +200,7 @@ export class CommentsContainer {
       commentObjects.push(commentsList[key]);
     }
     const commentCoords = commentObjects.map(obj => `${obj.left}:${obj.top}`);
-    console.log(formCoords);
+    console.log(commentCoords);
     const formCoords = [...new Set(commentCoords)];
     console.log(formCoords);
     formCoords
