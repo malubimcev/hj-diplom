@@ -145,15 +145,10 @@ export class CommentsContainer {
   }
   
   addBoard(coords) {
-    return new Promise((resolve, reject) => {
-      const commentBoard = new CommentBoard(this.container, this.app);
-      if (!commentBoard) {
-        return reject();
-      }
-      commentBoard.board.style.left = `${Math.round(coords.left - this.container.getBoundingClientRect().left)}px`;
-      commentBoard.board.style.top = `${Math.round(coords.top - this.container.getBoundingClientRect().top)}px`;
-      return resolve(commentBoard);
-    });
+    const commentBoard = new CommentBoard(this.container, this.app);
+    commentBoard.board.style.left = `${Math.round(coords.left - this.container.getBoundingClientRect().left)}px`;
+    commentBoard.board.style.top = `${Math.round(coords.top - this.container.getBoundingClientRect().top)}px`;
+    return commentBoard;
   }
   
   addComment(commentObj) {
@@ -163,34 +158,17 @@ export class CommentsContainer {
     const comment = createComment(commentObj);
 
     let elem = document.elementFromPoint(commentObj.left + 1, commentObj.top + 1);
-    console.log(`elem=${elem.tagName}.${elem.className}`);
 
-    const checkForm = () => {
-      return new Promise((resolve, reject) => {
-        if (elem.className !== 'comments__body') {
-          this.addBoard({
-            'left': commentObj.left,
-            'top': commentObj.top
-          })
-            .then(form => {
-              elem = form.board.querySelector('.comments__body');
-              console.log('addBoard.then');
-              return resolve();
-            })
-            .catch(err => console.log(`addBoard error: ${err}`));
-        } else {
-          return resolve();
-        }
+    if (elem.className !== 'comments__body') {
+      const form = this.addBoard({
+        'left': commentObj.left,
+        'top': commentObj.top
       })
+      elem = form.board.querySelector('.comments__body');
     }
 
-    checkForm()
-      .then(() => {
-        const refNode = elem.querySelector('.comment div');
-        elem.insertBefore(comment, refNode.parentElement);
-        console.log('checkForm.then');
-      })
-      .catch(err => console.log(`checkForm error: ${err}`));
+    const refNode = elem.querySelector('.comment div');
+    elem.insertBefore(comment, refNode.parentElement);
   }
 
   addListOfComments(commentsList) {
@@ -200,15 +178,12 @@ export class CommentsContainer {
       commentObjects.push(commentsList[key]);
     }
     const commentCoords = commentObjects.map(obj => `${obj.left}:${obj.top}`);
-    console.log(commentCoords);
     const formCoords = [...new Set(commentCoords)];
-    console.log(formCoords);
     formCoords
       .map(coord => [...coord.split(':')])
-      .forEach(coord => console.log(coord))
       .forEach(coord => this.addBoard({
-        'left': +coord[0],
-        'top': +coord[1]
+        'left': coord[0],
+        'top': coord[1]
       }));
 
     commentObjects.forEach(obj => {
@@ -225,7 +200,6 @@ export class CommentsContainer {
   }
 
   onClick(event) {
-    console.log(`click at: ${event.pageX}:${event.pageY}`)
     if (this.app.currentMode === 'comments') {
       if (event.target.className === 'comments-container') {
         this.addBoard({
