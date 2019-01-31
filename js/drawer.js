@@ -105,6 +105,7 @@ export function createMask(container) {
     mask.style.top = `${canvas.style.top}px`;
     mask.width = canvas.width;
     mask.height = canvas.height;
+    mask.crossOrigin = "anonymous";//для обхода CORS при склеивании маски с холстом
     return resolve(mask);
   });
 };

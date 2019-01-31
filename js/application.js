@@ -198,7 +198,7 @@ export default class Application {
     createMask(this.currentImage)
       .then((mask) => {
         mask.addEventListener('load', () => {
-          mask.crossOrigin = "Anonymous";//для обхода CORS при склеивании маски с холстом
+          
           this.currentImage.parentElement.insertBefore(mask, this.error);
           this.drawer.clearCanvas();
         });
