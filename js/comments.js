@@ -146,20 +146,24 @@ export class CommentsContainer {
   
   addBoard(coords) {
     const commentBoard = new CommentBoard(this.container, this.app);
-    commentBoard.board.style.left = `${Math.round(coords.left - this.container.getBoundingClientRect().left)}px`;
-    commentBoard.board.style.top = `${Math.round(coords.top - this.container.getBoundingClientRect().top)}px`;
+    // commentBoard.board.style.left = `${Math.round(coords.left - this.container.getBoundingClientRect().left)}px`;
+    // commentBoard.board.style.top = `${Math.round(coords.top - this.container.getBoundingClientRect().top)}px`;
+    commentBoard.board.style.left = `${Math.round(coords.left)}px`;
+    commentBoard.board.style.top = `${Math.round(coords.top)}px`;
     return commentBoard;
   }
   
   addComment(commentObj) {
-    commentObj.left += this.container.getBoundingClientRect().left;
-    commentObj.top += this.container.getBoundingClientRect().top;
+    // commentObj.left += this.container.getBoundingClientRect().left;
+    // commentObj.top += this.container.getBoundingClientRect().top;
+    this.transformCoords(commentObj, 1);
 
     const comment = createComment(commentObj);
 
     let elem = document.elementFromPoint(commentObj.left + 1, commentObj.top + 1);
 
     if (elem.className !== 'comments__body') {
+      this.transformCoords(commentObj, -1);
       const form = this.addBoard({
         'left': commentObj.left,
         'top': commentObj.top
@@ -169,6 +173,11 @@ export class CommentsContainer {
 
     const refNode = elem.querySelector('.comment div');
     elem.insertBefore(comment, refNode.parentElement);
+  }
+
+  transformCoords(commentObj, sign) {
+    commentObj.left = commentObj.left + sign * this.container.getBoundingClientRect().left;
+    commentObj.top = commentObj.top + sign *  this.container.getBoundingClientRect().top;    
   }
 
   addListOfComments(commentsList) {
