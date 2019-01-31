@@ -170,9 +170,9 @@ export class CommentsContainer {
     elem.insertBefore(comment, refNode.parentElement);
   }
 
-  transformCoords(commentObj, sign) {
-    commentObj.left = commentObj.left + sign * this.container.getBoundingClientRect().left;
-    commentObj.top = commentObj.top + sign * this.container.getBoundingClientRect().top;    
+  transformCoords(coords, sign) {
+    coords.left = coords.left + sign * this.container.getBoundingClientRect().left;
+    coords.top = coords.top + sign * this.container.getBoundingClientRect().top;    
   }
 
   addListOfComments(commentsList) {
@@ -206,10 +206,12 @@ export class CommentsContainer {
   onClick(event) {
     if (this.app.currentMode === 'comments') {
       if (event.target.className === 'comments-container') {
-        this.addBoard({
+        const coords = {
           'left': event.pageX,
           'top': event.pageY
-        });
+        }
+        this.transformCoords(coords, -1);
+        this.addBoard(coords);
       }
     }
   }

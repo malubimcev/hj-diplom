@@ -198,7 +198,6 @@ export default class Application {
     createMask(this.currentImage)
       .then((mask) => {
         mask.addEventListener('load', () => {
-          
           this.currentImage.parentElement.insertBefore(mask, this.error);
           this.drawer.clearCanvas();
         });
