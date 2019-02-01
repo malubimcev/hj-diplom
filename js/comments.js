@@ -173,7 +173,7 @@ export class CommentsContainer {
   transformCoords(coords, sign) {
     coords.left = coords.left + sign * this.container.getBoundingClientRect().left;
     coords.top = coords.top + sign * this.container.getBoundingClientRect().top;    
-  }
+  }9
 
   addListOfComments(commentsList) {
     const commentObjects = [];
@@ -207,8 +207,8 @@ export class CommentsContainer {
     if (this.app.currentMode === 'comments') {
       if (event.target.className === 'comments-container') {
         const coords = {
-          'left': event.pageX,
-          'top': event.pageY
+          'left': event.pageX - 8,
+          'top': event.pageY -10
         }
         this.transformCoords(coords, -1);
         this.addBoard(coords);
