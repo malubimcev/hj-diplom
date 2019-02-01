@@ -156,8 +156,8 @@ export class CommentsContainer {
 
     const comment = createComment(commentObj);
 
-    let elem = document.elementFromPoint(commentObj.left + 1, commentObj.top + 1);
-    if (elem.className !== 'comments__body') {
+    let elem = document.elementFromPoint(commentObj.left + 10, commentObj.top + 1);
+    if (elem.className !== 'comments__marker') {
       this.transformCoords(commentObj, -1);
       const form = this.addBoard({
         'left': commentObj.left,
@@ -207,7 +207,7 @@ export class CommentsContainer {
     if (this.app.currentMode === 'comments') {
       if (event.target.className === 'comments-container') {
         const coords = {
-          'left': event.pageX - 8,
+          'left': event.pageX - 18,
           'top': event.pageY -10
         }
         this.transformCoords(coords, -1);
