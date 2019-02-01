@@ -207,8 +207,8 @@ export class CommentsContainer {
     if (this.app.currentMode === 'comments') {
       if (event.target.className === 'comments-container') {
         const coords = {
-          'left': event.pageX - 20,
-          'top': event.pageY -10
+          'left': event.pageX,
+          'top': event.pageY
         }
         this.transformCoords(coords, -1);
         this.addBoard(coords);
