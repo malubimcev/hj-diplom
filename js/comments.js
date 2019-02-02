@@ -229,6 +229,9 @@ export class CommentsContainer {
     }
     for (const elem of formElements) {
       elem.style = mode === 'on' ? 'visibility: visible;' : 'visibility: hidden;';
+      if (elem.className === 'comments__marker') {
+        elem.style = 'display: block;';
+      }
     }
   }
 
