@@ -84,7 +84,7 @@ class CommentBoard {
     this.addButton = this.board.querySelector('.comments__submit');
     this.closeButton = this.board.querySelector('.comments__close');
     this.commentInput = this.board.querySelector('.comments__input');
-    this.body = this.board.querySelector('.comments__body');
+    // this.body = this.board.querySelector('.comments__body');
     this.commentLoader = this.board.querySelector('.comment div');
 
     this.registerEvents();
@@ -123,6 +123,11 @@ class CommentBoard {
     this.marker.style = 'display: none;';
   }
 
+  show() {
+    this.board.style = 'display: block;';
+    this.marker.style = 'display: block;';
+  }
+
 }//end class CommentBoard
 
 export class CommentsContainer {
@@ -157,7 +162,7 @@ export class CommentsContainer {
     const comment = createComment(commentObj);
 
     let elem = document.elementFromPoint(commentObj.left + 1, commentObj.top + 1);
-    if (elem.className !== 'comments__marker') {
+    if (elem.className !== 'comments__body') {
       this.transformCoords(commentObj, -1);
       const form = this.addBoard({
         'left': commentObj.left,
@@ -173,7 +178,7 @@ export class CommentsContainer {
   transformCoords(coords, sign) {
     coords.left = coords.left + sign * this.container.getBoundingClientRect().left;
     coords.top = coords.top + sign * this.container.getBoundingClientRect().top;    
-  }9
+  }
 
   addListOfComments(commentsList) {
     const commentObjects = [];
@@ -220,7 +225,7 @@ export class CommentsContainer {
     const forms = this.container.querySelectorAll('.comments__form');
     const formElements = this.container.querySelectorAll('.comments__form *');
     for (const frm of forms) {
-      frm.style.zIndex = mode === 'on' ? 2 : 0;
+      frm.style.zIndex = mode === 'on' ? 1 : 0;
     }
     for (const elem of formElements) {
       elem.style = mode === 'on' ? 'visibility: visible;' : 'visibility: hidden;';
