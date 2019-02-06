@@ -142,6 +142,8 @@ export class CommentsContainer {
     this.container.style.height = `${app.currentImage.offsetHeight}px`;
     this.app.setElementPositionToCenter(this.container);
 
+    this.boards = [];
+
     this.registerEvents();
   }
 
@@ -153,17 +155,18 @@ export class CommentsContainer {
     const commentBoard = new CommentBoard(this.container, this.app);
     commentBoard.board.style.left = `${Math.round(coords.left)}px`;
     commentBoard.board.style.top = `${Math.round(coords.top)}px`;
+    this.boards.push(commentBoard);
     return commentBoard;
   }
   
   addComment(commentObj) {
-    this.transformCoords(commentObj, 1);
+    transformCoords(commentObj, 1);
 
     const comment = createComment(commentObj);
 
-    let elem = document.elementFromPoint(commentObj.left + 1, commentObj.top + 1);
+    let elem = document.elementFromPoint(commentObj.left, commentObj.top);
     if (elem.className !== 'comments__body') {
-      this.transformCoords(commentObj, -1);
+      transformCoords(commentObj, -1);
       const form = this.addBoard({
         'left': commentObj.left,
         'top': commentObj.top
@@ -173,11 +176,6 @@ export class CommentsContainer {
 
     const refNode = elem.querySelector('.comment div');
     elem.insertBefore(comment, refNode.parentElement);
-  }
-
-  transformCoords(coords, sign) {
-    coords.left = coords.left + sign * this.container.getBoundingClientRect().left;
-    coords.top = coords.top + sign * this.container.getBoundingClientRect().top;    
   }
 
   addListOfComments(commentsList) {
@@ -215,7 +213,7 @@ export class CommentsContainer {
           'left': event.pageX,
           'top': event.pageY
         }
-        this.transformCoords(coords, -1);
+        transformCoords(coords, -1);
         this.addBoard(coords);
       }
     }
@@ -236,3 +234,8 @@ export class CommentsContainer {
   }
 
 }//end class CommentsContainer
+
+function transformCoords(coords, sign) {
+  coords.left = coords.left + sign * this.container.getBoundingClientRect().left;
+  coords.top = coords.top + sign * this.container.getBoundingClientRect().top;    
+}
