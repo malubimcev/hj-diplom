@@ -164,16 +164,24 @@ export class CommentsContainer {
 
     const comment = createComment(commentObj);
 
-    let elem = document.elementFromPoint(commentObj.left, commentObj.top);
-    if (elem.className !== 'comments__body') {
-      transformCoords(commentObj, -1);
-      const form = this.addBoard({
-        'left': commentObj.left,
-        'top': commentObj.top
-      })
-      elem = form.board.querySelector('.comments__body');
-    }
+    // let elem = document.elementFromPoint(commentObj.left, commentObj.top);
+    // if (elem.className !== 'comments__body') {
+    //   transformCoords(commentObj, -1);
+    //   const form = this.addBoard({
+    //     'left': commentObj.left,
+    //     'top': commentObj.top
+    //   })
+    //   elem = form.board.querySelector('.comments__body');
+    // }
 
+    let commentsForm = this.boards.filter((form) => {
+      const rect = getBoundingClientRect(form.board);
+      if (rect.left === commentObj.left && rect.top === commentObj.top) {
+        return form;
+      }
+    });
+
+    const elem = commentsForm.board.querySelector('.comments__body');
     const refNode = elem.querySelector('.comment div');
     elem.insertBefore(comment, refNode.parentElement);
   }
