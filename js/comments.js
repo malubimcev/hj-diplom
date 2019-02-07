@@ -171,18 +171,14 @@ export class CommentsContainer {
     let commentsBoard = this.boards.find(board => {
       const rect = board.form.getBoundingClientRect();
       if (rect.left === commentObj.left && rect.top === commentObj.top) {
-        console.log(`form filtered: ${board.form.style.left}:${board.form.style.top}`);
         return board;
       }
     });
     if (!commentsBoard) {
-      console.log('form not found');
       commentsBoard = this.addBoard({
         'left': commentObj.left,
         'top': commentObj.top
       })
-    } else {
-      console.log(`commentsForm filtered: ${commentsBoard.form.style.left}:${commentsBoard.form.style.top}`);
     }
     commentsBoard.addComment(comment);
   }
@@ -238,17 +234,20 @@ export class CommentsContainer {
   }
 
   show(mode) {
-    const forms = this.container.querySelectorAll('.comments__form');
-    const formElements = this.container.querySelectorAll('.comments__form *');
-    for (const frm of forms) {
-      frm.style.zIndex = mode === 'on' ? 1 : 0;
-    }
-    for (const elem of formElements) {
-      elem.style = mode === 'on' ? 'visibility: visible;' : 'visibility: hidden;';
-      if (elem.className === 'comments__marker') {
-        elem.style = 'display: block;';
-      }
-    }
+    this.boards.forEach(board => {
+      board.form.style = mode === 'on' ? 'display: block;' : 'display: none;';
+    });
+    // const forms = this.container.querySelectorAll('.comments__form');
+    // const formElements = this.container.querySelectorAll('.comments__form *');
+    // for (const frm of forms) {
+    //   frm.style.zIndex = mode === 'on' ? 1 : 0;
+    // }
+    // for (const elem of formElements) {
+    //   elem.style = mode === 'on' ? 'visibility: visible;' : 'visibility: hidden;';
+    //   if (elem.className === 'comments__marker') {
+    //     elem.style = 'display: block;';
+    //   }
+    // }
   }
 
 }//end class CommentsContainer
