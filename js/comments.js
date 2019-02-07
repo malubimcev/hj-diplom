@@ -91,7 +91,7 @@ class CommentBoard {
   }
 
   registerEvents() {
-    this.closeButton.addEventListener('click', this.close.bind(this), false);
+    this.closeButton.addEventListener('click', this.hide.bind(this), false);
     this.addButton.addEventListener('click', this.sendComment.bind(this), false);
   }
 
@@ -122,7 +122,7 @@ class CommentBoard {
     });
   }
 
-  close() {
+  hide() {
     this.form.style = 'display: none;';
     this.marker.style = 'display: none;';
   }
@@ -235,7 +235,7 @@ export class CommentsContainer {
 
   show(mode) {
     this.boards.forEach(board => {
-      board.form.style = mode === 'on' ? 'display: block;' : 'display: none;';
+      mode === 'on' ? board.show() : board.hide();
     });
     // const forms = this.container.querySelectorAll('.comments__form');
     // const formElements = this.container.querySelectorAll('.comments__form *');
