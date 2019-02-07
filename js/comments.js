@@ -215,15 +215,13 @@ export class CommentsContainer {
   }
 
   onClick(event) {
-    if (this.app.currentMode === 'comments') {
-      if (event.target.className === 'comments-container') {
-        const coords = {
-          'left': event.pageX,
-          'top': event.pageY
-        }
-        this.transformCoords(coords, -1);
-        this.addBoard(coords);
+    if (this.app.currentMode === 'comments' && event.target.className === 'comments-container') {
+      const coords = {
+        'left': event.pageX,
+        'top': event.pageY
       }
+      this.transformCoords(coords, -1);
+      this.addBoard(coords);
     }
   }
 
