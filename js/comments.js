@@ -186,12 +186,20 @@ export class CommentsContainer {
         return form;
       }
     });
+    if (!commentsForm) {
+      console.log('form not found');
+      this.addBoard({
+        'left': commentObj.left,
+        'top': commentObj.top
+      })
+    }
     console.log(`commentsForm filtered: ${commentsForm.board.style.left}:${commentsForm.board.style.top}`);
+    commentsForm.addComment(comment);
 
-    const elem = commentsForm.board.querySelector('.comments__body');
-    console.log(`elem: ${elem.className}:${elem.parentElement.style.top}`);
-    const refNode = elem.querySelector('.comment div');
-    elem.insertBefore(comment, refNode.parentElement);
+    // const elem = commentsForm.board.querySelector('.comments__body');
+    // console.log(`elem: ${elem.className}:${elem.parentElement.style.top}`);
+    // const refNode = elem.querySelector('.comment div');
+    // elem.insertBefore(comment, refNode.parentElement);
   }
 
   addListOfComments(commentsList) {
