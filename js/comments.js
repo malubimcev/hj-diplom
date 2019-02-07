@@ -84,7 +84,7 @@ class CommentBoard {
     this.addButton = this.board.querySelector('.comments__submit');
     this.closeButton = this.board.querySelector('.comments__close');
     this.commentInput = this.board.querySelector('.comments__input');
-    // this.body = this.board.querySelector('.comments__body');
+    this.body = this.board.querySelector('.comments__body');
     this.commentLoader = this.board.querySelector('.comment div');
 
     this.registerEvents();
@@ -93,6 +93,10 @@ class CommentBoard {
   registerEvents() {
     this.closeButton.addEventListener('click', this.close.bind(this), false);
     this.addButton.addEventListener('click', this.sendComment.bind(this), false);
+  }
+
+  addComment(comment) {
+    this.body.insertBefore(comment, this.commentLoader.parentElement);
   }
 
   sendComment(event) {
