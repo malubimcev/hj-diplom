@@ -176,7 +176,7 @@ export class CommentsContainer {
     // }
 
     let commentsForm = this.boards.filter((form) => {
-      const rect = getBoundingClientRect(form.board);
+      const rect = form.board.getBoundingClientRect();
       if (rect.left === commentObj.left && rect.top === commentObj.top) {
         console.log(`form filtered: ${form.board.style.left}:${form.board.style.top}`);
         return form;
