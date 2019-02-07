@@ -188,12 +188,13 @@ export class CommentsContainer {
     });
     if (!commentsForm) {
       console.log('form not found');
-      this.addBoard({
+      commentsForm = this.addBoard({
         'left': commentObj.left,
         'top': commentObj.top
       })
+    } else {
+      console.log(`commentsForm filtered: ${commentsForm.board.style.left}:${commentsForm.board.style.top}`);
     }
-    console.log(`commentsForm filtered: ${commentsForm.board.style.left}:${commentsForm.board.style.top}`);
     commentsForm.addComment(comment);
 
     // const elem = commentsForm.board.querySelector('.comments__body');
