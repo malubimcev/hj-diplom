@@ -161,13 +161,13 @@ export class CommentsContainer {
   }
   
   addComment(commentObj) {
-    transformCoords(commentObj, 1);
+    this.transformCoords(commentObj, 1);
 
     const comment = createComment(commentObj);
 
     // let elem = document.elementFromPoint(commentObj.left, commentObj.top);
     // if (elem.className !== 'comments__body') {
-    //   transformCoords(commentObj, -1);
+    //   this.transformCoords(commentObj, -1);
     //   const form = this.addBoard({
     //     'left': commentObj.left,
     //     'top': commentObj.top
@@ -223,10 +223,15 @@ export class CommentsContainer {
           'left': event.pageX,
           'top': event.pageY
         }
-        transformCoords(coords, -1);
+        this.transformCoords(coords, -1);
         this.addBoard(coords);
       }
     }
+  }
+
+  transformCoords(coords, sign) {
+    coords.left = coords.left + sign * this.container.getBoundingClientRect().left;
+    coords.top = coords.top + sign * this.container.getBoundingClientRect().top;    
   }
 
   show(mode) {
@@ -244,8 +249,3 @@ export class CommentsContainer {
   }
 
 }//end class CommentsContainer
-
-function transformCoords(coords, sign) {
-  coords.left = coords.left + sign * this.container.getBoundingClientRect().left;
-  coords.top = coords.top + sign * this.container.getBoundingClientRect().top;    
-}
