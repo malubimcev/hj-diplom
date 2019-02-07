@@ -504,6 +504,9 @@ body {
   background-color: #dae2ea;
 }
 
+.comments__hidden{
+  display: none;
+}
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~ поделиться ~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 .menu__url {

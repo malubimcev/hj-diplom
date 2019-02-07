@@ -123,13 +123,13 @@ class CommentBoard {
   }
 
   hide() {
-    this.form.style = 'display: none;';
-    this.marker.style = 'display: none;';
+    this.form.classList.add('comments__hidden');
+    this.marker.classList.add('comments__hidden');  
   }
 
   show() {
-    this.form.style = 'display: block;';
-    this.marker.style = 'display: block;';
+    this.form.classList.remove('comments__hidden');
+    this.marker.classList.remove('comments__hidden');    
   }
 
 }//end class CommentBoard
@@ -160,6 +160,7 @@ export class CommentsContainer {
     commentBoard.form.style.left = `${Math.round(coords.left)}px`;
     commentBoard.form.style.top = `${Math.round(coords.top)}px`;
     this.boards.push(commentBoard);
+    commentBoard.show();
     return commentBoard;
   }
   
@@ -174,12 +175,14 @@ export class CommentsContainer {
         return board;
       }
     });
+
     if (!commentsBoard) {
       commentsBoard = this.addBoard({
         'left': commentObj.left,
         'top': commentObj.top
       })
     }
+
     commentsBoard.addComment(comment);
   }
 
@@ -193,9 +196,9 @@ export class CommentsContainer {
     const formCoords = [...new Set(commentCoords)];
     formCoords
       .map(coord => [...coord.split(':')])
-      .forEach(coord => this.addBoard({
-        'left': coord[0],
-        'top': coord[1]
+      .forEach(coords => this.addBoard({
+        'left': coords[0],
+        'top': coords[1]
       }));
 
     commentObjects.forEach(obj => {
@@ -204,10 +207,6 @@ export class CommentsContainer {
   }
   
   removeAll() {
-    // const commentBoards = this.container.querySelectorAll('.comments__form');
-    // for (const board of commentBoards) {
-    //   this.container.removeChild(board);
-    // }
     this.boards.forEach(board => {
       this.container.removeChild(board.form);
       board = null;
@@ -234,20 +233,7 @@ export class CommentsContainer {
   }
 
   show(mode) {
-    this.boards.forEach(board => {
-      mode === 'on' ? board.show() : board.hide();
-    });
-    // const forms = this.container.querySelectorAll('.comments__form');
-    // const formElements = this.container.querySelectorAll('.comments__form *');
-    // for (const frm of forms) {
-    //   frm.style.zIndex = mode === 'on' ? 1 : 0;
-    // }
-    // for (const elem of formElements) {
-    //   elem.style = mode === 'on' ? 'visibility: visible;' : 'visibility: hidden;';
-    //   if (elem.className === 'comments__marker') {
-    //     elem.style = 'display: block;';
-    //   }
-    // }
+    this.boards.forEach(board => mode === 'on' ? board.show() : board.hide());
   }
 
 }//end class CommentsContainer
