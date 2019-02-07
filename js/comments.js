@@ -2,7 +2,7 @@
 
 import FileLoader from "./loader.js";
 
-function createBoard() {
+function createCommentsForm() {
   const form = document.createElement('form');
   form.classList.add('comments__form');
 
@@ -76,16 +76,16 @@ function createComment(commentInfo) {
 
 class CommentBoard {
   constructor(container, app) {
-    this.board = createBoard();
+    this.form = createCommentsForm();
     this.app = app;
-    this.board.style.zIndex = container.style.zIndex + 1;
-    container.appendChild(this.board);
-    this.marker = this.board.querySelector('.comments__marker');
-    this.addButton = this.board.querySelector('.comments__submit');
-    this.closeButton = this.board.querySelector('.comments__close');
-    this.commentInput = this.board.querySelector('.comments__input');
-    this.body = this.board.querySelector('.comments__body');
-    this.commentLoader = this.board.querySelector('.comment div');
+    this.form.style.zIndex = container.style.zIndex + 1;
+    container.appendChild(this.form);
+    this.marker = this.form.querySelector('.comments__marker');
+    this.addButton = this.form.querySelector('.comments__submit');
+    this.closeButton = this.form.querySelector('.comments__close');
+    this.commentInput = this.form.querySelector('.comments__input');
+    this.body = this.form.querySelector('.comments__body');
+    this.commentLoader = this.form.querySelector('.comment div');
 
     this.registerEvents();
   }
@@ -102,8 +102,8 @@ class CommentBoard {
   sendComment(event) {
   	event.preventDefault();
     const commentInfoObj = {
-    	'left': parseInt(this.board.style.left),
-    	'top': parseInt(this.board.style.top),
+    	'left': parseInt(this.form.style.left),
+    	'top': parseInt(this.form.style.top),
     	'message': this.commentInput.value
     }
     this.commentInput.value = '';
@@ -123,12 +123,12 @@ class CommentBoard {
   }
 
   close() {
-    this.board.style = 'display: none;';
+    this.form.style = 'display: none;';
     this.marker.style = 'display: none;';
   }
 
   show() {
-    this.board.style = 'display: block;';
+    this.form.style = 'display: block;';
     this.marker.style = 'display: block;';
   }
 
@@ -157,10 +157,9 @@ export class CommentsContainer {
   
   addBoard(coords) {
     const commentBoard = new CommentBoard(this.container, this.app);
-    commentBoard.board.style.left = `${Math.round(coords.left)}px`;
-    commentBoard.board.style.top = `${Math.round(coords.top)}px`;
+    commentBoard.form.style.left = `${Math.round(coords.left)}px`;
+    commentBoard.form.style.top = `${Math.round(coords.top)}px`;
     this.boards.push(commentBoard);
-    console.log(`form added at ${coords.left}:${coords.top}`);
     return commentBoard;
   }
   
@@ -169,38 +168,23 @@ export class CommentsContainer {
 
     const comment = createComment(commentObj);
 
-    // let elem = document.elementFromPoint(commentObj.left, commentObj.top);
-    // if (elem.className !== 'comments__body') {
-    //   this.transformCoords(commentObj, -1);
-    //   const form = this.addBoard({
-    //     'left': commentObj.left,
-    //     'top': commentObj.top
-    //   })
-    //   elem = form.board.querySelector('.comments__body');
-    // }
-
-    let commentsForm = this.boards.filter((form) => {
-      const rect = form.board.getBoundingClientRect();
+    let commentsBoard = this.boards.find(board => {
+      const rect = board.form.getBoundingClientRect();
       if (rect.left === commentObj.left && rect.top === commentObj.top) {
-        console.log(`form filtered: ${form.board.style.left}:${form.board.style.top}`);
-        return form;
+        console.log(`form filtered: ${board.form.style.left}:${board.form.style.top}`);
+        return board;
       }
     });
-    if (!commentsForm) {
+    if (!commentsBoard) {
       console.log('form not found');
-      commentsForm = this.addBoard({
+      commentsBoard = this.addBoard({
         'left': commentObj.left,
         'top': commentObj.top
       })
     } else {
-      console.log(`commentsForm filtered: ${commentsForm.board.style.left}:${commentsForm.board.style.top}`);
+      console.log(`commentsForm filtered: ${commentsBoard.form.style.left}:${commentsBoard.form.style.top}`);
     }
-    commentsForm.addComment(comment);
-
-    // const elem = commentsForm.board.querySelector('.comments__body');
-    // console.log(`elem: ${elem.className}:${elem.parentElement.style.top}`);
-    // const refNode = elem.querySelector('.comment div');
-    // elem.insertBefore(comment, refNode.parentElement);
+    commentsBoard.addComment(comment);
   }
 
   addListOfComments(commentsList) {
@@ -224,10 +208,14 @@ export class CommentsContainer {
   }
   
   removeAll() {
-    const commentBoards = this.container.querySelectorAll('.comments__form');
-    for (const board of commentBoards) {
-      this.container.removeChild(board);
-    }
+    // const commentBoards = this.container.querySelectorAll('.comments__form');
+    // for (const board of commentBoards) {
+    //   this.container.removeChild(board);
+    // }
+    this.boards.forEach(board => {
+      this.container.removeChild(board.form);
+      board = null;
+    });
     this.app.container.removeChild(this.container);
   }
 
