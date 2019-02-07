@@ -156,6 +156,7 @@ export class CommentsContainer {
     commentBoard.board.style.left = `${Math.round(coords.left)}px`;
     commentBoard.board.style.top = `${Math.round(coords.top)}px`;
     this.boards.push(commentBoard);
+    console.log(`form added at ${coords.left}:${coords.top}`);
     return commentBoard;
   }
   
@@ -177,6 +178,7 @@ export class CommentsContainer {
     let commentsForm = this.boards.filter((form) => {
       const rect = getBoundingClientRect(form.board);
       if (rect.left === commentObj.left && rect.top === commentObj.top) {
+        console.log(`form filtered: ${form.board.style.left}:${form.board.style.top}`);
         return form;
       }
     });
