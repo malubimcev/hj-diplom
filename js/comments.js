@@ -2,7 +2,7 @@
 
 import FileLoader from "./loader.js";
 
-function createBoard() {
+function createCommentsForm() {
   const form = document.createElement('form');
   form.classList.add('comments__form');
 
@@ -76,30 +76,34 @@ function createComment(commentInfo) {
 
 class CommentBoard {
   constructor(container, app) {
-    this.board = createBoard();
+    this.form = createCommentsForm();
     this.app = app;
-    this.board.style.zIndex = container.style.zIndex + 1;
-    container.appendChild(this.board);
-    this.marker = this.board.querySelector('.comments__marker');
-    this.addButton = this.board.querySelector('.comments__submit');
-    this.closeButton = this.board.querySelector('.comments__close');
-    this.commentInput = this.board.querySelector('.comments__input');
-    this.body = this.board.querySelector('.comments__body');
-    this.commentLoader = this.board.querySelector('.comment div');
+    this.form.style.zIndex = container.style.zIndex + 1;
+    container.appendChild(this.form);
+    this.marker = this.form.querySelector('.comments__marker');
+    this.addButton = this.form.querySelector('.comments__submit');
+    this.closeButton = this.form.querySelector('.comments__close');
+    this.commentInput = this.form.querySelector('.comments__input');
+    this.body = this.form.querySelector('.comments__body');
+    this.commentLoader = this.form.querySelector('.comment div');
 
     this.registerEvents();
   }
 
   registerEvents() {
-    this.closeButton.addEventListener('click', this.close.bind(this), false);
+    this.closeButton.addEventListener('click', this.hide.bind(this), false);
     this.addButton.addEventListener('click', this.sendComment.bind(this), false);
+  }
+
+  addComment(comment) {
+    this.body.insertBefore(comment, this.commentLoader.parentElement);
   }
 
   sendComment(event) {
   	event.preventDefault();
     const commentInfoObj = {
-    	'left': parseInt(this.board.style.left),
-    	'top': parseInt(this.board.style.top),
+    	'left': parseInt(this.form.style.left),
+    	'top': parseInt(this.form.style.top),
     	'message': this.commentInput.value
     }
     this.commentInput.value = '';
@@ -118,15 +122,15 @@ class CommentBoard {
     });
   }
 
-  close() {
-    this.board.style = 'display: none;';
-    this.marker.style = 'display: none;';
+  hide() {
+    this.form.classList.add('comments__hidden');
+    this.marker.classList.add('comments__hidden');  
   }
 
-  // addComment(commentObj) {
-  //   const comment = createComment(commentObj);
-  //   this.body.insertBefore(comment, this.commentLoader);
-  // }
+  show() {
+    this.form.classList.remove('comments__hidden');
+    this.marker.classList.remove('comments__hidden');    
+  }
 
 }//end class CommentBoard
 
@@ -142,6 +146,8 @@ export class CommentsContainer {
     this.container.style.height = `${app.currentImage.offsetHeight}px`;
     this.app.setElementPositionToCenter(this.container);
 
+    this.boards = [];
+
     this.registerEvents();
   }
 
@@ -150,98 +156,82 @@ export class CommentsContainer {
   }
   
   addBoard(coords) {
-    return new Promise((resolve, reject) => {
-      const commentBoard = new CommentBoard(this.container, this.app);
-      if (!commentBoard) {
-        return reject();
-      }
-      commentBoard.board.style.left = `${Math.round(coords.left - this.container.getBoundingClientRect().left)}px`;
-      commentBoard.board.style.top = `${Math.round(coords.top - this.container.getBoundingClientRect().top)}px`;
-      return resolve(commentBoard);
-    });
+    const commentBoard = new CommentBoard(this.container, this.app);
+    commentBoard.form.style.left = `${Math.round(coords.left)}px`;
+    commentBoard.form.style.top = `${Math.round(coords.top)}px`;
+    this.boards.push(commentBoard);
+    commentBoard.show();
+    return commentBoard;
   }
   
   addComment(commentObj) {
-    commentObj.left += this.container.getBoundingClientRect().left;
-    commentObj.top += this.container.getBoundingClientRect().top;
+    this.transformCoords(commentObj, 1);
 
     const comment = createComment(commentObj);
 
-    let elem = document.elementFromPoint(commentObj.left + 5, commentObj.top + 5);
-    console.log(`elem=${elem.className}`);
+    let commentsBoard = this.boards.find(board => {
+      const rect = board.form.getBoundingClientRect();
+      if (rect.left === commentObj.left && rect.top === commentObj.top) {
+        return board;
+      }
+    });
 
-    const checkForm = () => {
-      return new Promise((resolve, reject) => {
-        if (elem.className !== 'comments__body') {
-          this.addBoard({
-            'left': commentObj.left,
-            'top': commentObj.top
-          })
-            .then(form => {
-              elem = form.board.querySelector('.comments__body');
-              return resolve();
-            })
-            .catch(err => console.log(`addBoard error: ${err}`));
-        } else {
-          return resolve();
-        }
+    if (!commentsBoard) {
+      commentsBoard = this.addBoard({
+        'left': commentObj.left,
+        'top': commentObj.top
       })
     }
 
-    checkForm()
-      .then(() => {
-        const refNode = elem.querySelector('.comment div');
-        elem.insertBefore(comment, refNode.parentElement);      
-      })
-      .catch(err => console.log(`checkForm error: ${err}`));
+    commentsBoard.addComment(comment);
   }
 
   addListOfComments(commentsList) {
     const commentObjects = [];
 
-    const addCommentPromise = commentObj => {
-      return new Promise((resolve, reject) => {
-        this.addComment(commentObj);
-        return resolve();
-      });
-    }
-
     for (const key in commentsList) {
       commentObjects.push(commentsList[key]);
     }
-    // commentObjects.reduce((promise, obj) => promise.then(addCommentPromise(obj)), Promise.resolve());
-    let action = Promise.resolve();
-    commentObjects.forEach(obj => action = action.then(addCommentPromise(obj)));
+    const commentCoords = commentObjects.map(obj => `${obj.left}:${obj.top}`);
+    const formCoords = [...new Set(commentCoords)];
+    formCoords
+      .map(coord => [...coord.split(':')])
+      .forEach(coords => this.addBoard({
+        'left': coords[0],
+        'top': coords[1]
+      }));
+
+    commentObjects.forEach(obj => {
+      this.addComment(obj);
+    });
   }
   
   removeAll() {
-    const commentBoards = this.container.querySelectorAll('.comments__form');
-    for (const board of commentBoards) {
-      this.container.removeChild(board);
-    }
+    this.boards.forEach(board => {
+      this.container.removeChild(board.form);
+      board = null;
+    });
     this.app.container.removeChild(this.container);
   }
 
   onClick(event) {
-    if (this.app.currentMode === 'comments') {
-      if (event.target.className === 'comments-container') {
-        this.addBoard({
-          'left': event.pageX,
-          'top': event.pageY
-        });
+    if (this.app.currentMode === 'comments' && event.target.className === 'comments-container') {
+      const coords = {
+        'left': event.pageX,
+        'top': event.pageY
       }
+      this.transformCoords(coords, -1);
+      this.addBoard(coords);
     }
   }
 
+  transformCoords(coords, sign) {
+    coords.left = coords.left + sign * this.container.getBoundingClientRect().left;
+    coords.top = coords.top + sign * this.container.getBoundingClientRect().top;    
+  }
+
   show(mode) {
-    const forms = this.container.querySelectorAll('.comments__form');
-    const formElements = this.container.querySelectorAll('.comments__form *');
-    for (const frm of forms) {
-      frm.style.zIndex = mode === 'on' ? 2 : 0;
-    }
-    for (const elem of formElements) {
-      elem.style = mode === 'on' ? 'visibility: visible;' : 'visibility: hidden;';
-    }
+    this.boards.forEach(board => mode === 'on' ? board.show() : board.hide());
   }
 
 }//end class CommentsContainer

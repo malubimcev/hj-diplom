@@ -68,28 +68,26 @@ export class Drawer {
   }
 
   newMask() {
-    if (this.app.currentMode === 'draw') {
-      createMask(this.image)
-        .then((mask) => {
-          mask.addEventListener('load', () => {
-            canvas.toBlob(blob => {
-              this.app.uploadMask(blob)
-                .then(() => mask = null)
-                .then(() => this.clear())
-                .catch(() => console.log('promise error'));
-            });
-          });
-          mask.src = canvas.toDataURL();
-        });
+    const mask = this.app.container.querySelector('img.mask');
+    if (mask) {
+      ctx.drawImage(mask, 0, 0);
+    }
+    canvas.toBlob(blob => {
+      this.app.uploadMask(blob)
+        .then(() => this.clearMasks())
+        .catch((err) => console.log(`promise err: ${err.message}`));
+    });
+  }
+
+  clearMasks() {
+    const oldMasks = this.app.container.querySelectorAll('img.mask');
+    for (const mask of oldMasks) {
+      mask.parentElement.removeChild(mask);
     }
   }
 
-  clear() {
-    // const oldMasks = this.app.container.querySelectorAll('img.mask');
-    // for (const mask of oldMasks) {
-      //mask.parentElement.removeChild(mask);
-    // }
-    clearRect(0, 0, canvas.width, canvas.height);
+  clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
   setColor(colorName) {
@@ -107,7 +105,7 @@ export function createMask(container) {
     mask.style.top = `${canvas.style.top}px`;
     mask.width = canvas.width;
     mask.height = canvas.height;
-    canvas.style.zIndex = mask.style.zIndex + 1;
+    mask.crossOrigin = "anonymous";//для обхода CORS при склеивании маски с холстом
     return resolve(mask);
   });
 };

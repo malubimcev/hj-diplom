@@ -77,14 +77,14 @@ export default class Application {
   }
 
   setCommentMode(mode) {
-    this.commentsContainer.container.style.zIndex = 2;
+    this.container.appendChild(this.commentsContainer.container);
     this.commentsContainer.show(mode);
     this.menu.setCommentState();
     this.currentMode = 'comments';
   }
 
   setDrawMode() {
-    this.commentsContainer.container.style.zIndex = 0;
+    this.container.appendChild(this.drawer.canvas);
     this.currentMode = 'draw';
   }
 
@@ -113,7 +113,7 @@ export default class Application {
   onDrop(event) {
     const file = event.dataTransfer.files[0];
     const fileType = /^image\//;
-    if (this.currentMode === 'publication') {
+    if (this.currentMode === 'publication' && !this.isUpdated) {
       if (file && file.type.match(fileType)) {
         this.uploadFile(file);
       } else {
@@ -137,6 +137,7 @@ export default class Application {
 
   onFileUploaded(data) {
     this.setPageData(data);
+    this.connection = null;
     this.createWebSocketConnection();
     setTimeout(this.setShareMode.bind(this), 2 * 1000);
   }
@@ -163,12 +164,12 @@ export default class Application {
       this.commentsContainer = new CommentsContainer(this);
     }
 
-    this.updatePage();
     if (this.isUpdated) {
       this.setCommentMode('on');
     } else {
       this.createWebSocketConnection();
     }
+    this.updatePage();
   }
 
   clearPage() {
@@ -193,14 +194,19 @@ export default class Application {
   }
 
   addMask(url) {
+    //вызывается из Socket при событии "mask"
     createMask(this.currentImage)
       .then((mask) => {
-        mask.addEventListener('load', () => this.currentImage.parentElement.insertBefore(mask, this.error));
+        mask.addEventListener('load', () => {
+          this.currentImage.parentElement.insertBefore(mask, this.error);
+          this.drawer.clearCanvas();
+        });
         mask.src = url;
       });
   }
 
   addComment(commentObj) {
+    //вызывается из Socket при событии "comment"
     this.commentsContainer.addComment(commentObj);
   }
 
