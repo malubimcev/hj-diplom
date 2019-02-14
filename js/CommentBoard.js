@@ -61,7 +61,8 @@ function createComment(commentInfo) {
 
   const message = document.createElement('p');
   message.classList.add('comment__message');
-  message.textContent = commentInfo.message;
+  const messageString = commentInfo.message.replace('\n', '<br>');
+  message.textContent = messageString;
 
   const comment = document.createElement('div');
   comment.classList.add('comment');
@@ -125,7 +126,7 @@ export class CommentBoard {
 
   hide() {
     this.form.classList.add('comments__hidden');
-    this.marker.classList.add('comments__hidden');  
+    // this.marker.classList.add('comments__hidden');  
   }
 
   show() {

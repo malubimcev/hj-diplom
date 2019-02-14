@@ -70,8 +70,7 @@ export default class Application {
   }
 
   setShareMode() {
-    const id = this.imageId ? ('?id=' + this.imageId) : '';
-    this.menu.linkField.value = this.page + id;
+    this.menu.linkField.value = this.page;
     this.menu.setShareState();
     this.currentMode = 'share';
   }
@@ -137,6 +136,7 @@ export default class Application {
 
   onFileUploaded(data) {
     this.setPageData(data);
+    document.location.assign(this.page);
     this.connection = null;
     this.createWebSocketConnection();
     setTimeout(this.setShareMode.bind(this), 2 * 1000);
@@ -144,7 +144,9 @@ export default class Application {
   
   setPageData(data) {
     this.pageData = data;
-    this.imageId = this.pageData.id;   
+    this.imageId = this.pageData.id;
+    const id = this.imageId ? ('?id=' + this.imageId) : '';
+    this.page += id;
   }
 
   setImageSrc(data) {
