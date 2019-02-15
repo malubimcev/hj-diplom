@@ -61,8 +61,7 @@ function createComment(commentInfo) {
 
   const message = document.createElement('p');
   message.classList.add('comment__message');
-  const messageString = commentInfo.message.replace('\n', '<br>');
-  message.textContent = messageString;
+  message.innerText = commentInfo.message.replace('\n', '<br>');
 
   const comment = document.createElement('div');
   comment.classList.add('comment');
@@ -92,7 +91,7 @@ export class CommentBoard {
   }
 
   registerEvents() {
-    this.closeButton.addEventListener('click', this.hide.bind(this), false);
+    this.closeButton.addEventListener('click', this.form.classList.add('comments__hidden'), false);
     this.addButton.addEventListener('click', this.sendComment.bind(this), false);
   }
 
@@ -126,7 +125,7 @@ export class CommentBoard {
 
   hide() {
     this.form.classList.add('comments__hidden');
-    // this.marker.classList.add('comments__hidden');  
+    this.marker.classList.add('comments__hidden');  
   }
 
   show() {
