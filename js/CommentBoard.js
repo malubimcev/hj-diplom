@@ -91,7 +91,7 @@ export class CommentBoard {
   }
 
   registerEvents() {
-    this.closeButton.addEventListener('click', () => this.body.classList.add('comments__hidden'), false);
+    this.closeButton.addEventListener('click', () => this.form.classList.add('comments__hidden'), false);
     this.addButton.addEventListener('click', this.sendComment.bind(this), false);
   }
 
