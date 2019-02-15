@@ -61,7 +61,7 @@ function createComment(commentInfo) {
 
   const message = document.createElement('p');
   message.classList.add('comment__message');
-  message.innerText = commentInfo.message.replace('\n', '<br>');
+  message.innerText = commentInfo.message;
 
   const comment = document.createElement('div');
   comment.classList.add('comment');
