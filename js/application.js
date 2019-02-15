@@ -3,7 +3,7 @@
 import Menu from "./menu.js";
 import FileLoader from "./loader.js";
 import WSConnection from "./socket.js";
-import {CommentsContainer} from "./comments.js";
+import {CommentsContainer} from "./commentsContainer.js";
 import {Drawer} from "./drawer.js";
 import {createMask} from "./drawer.js";
 
@@ -137,9 +137,9 @@ export default class Application {
 
   onFileUploaded(data) {
     this.setPageData(data);
-    document.location.assign(this.page);
     this.connection = null;
     this.createWebSocketConnection();
+    document.location.assign(this.page);
     setTimeout(this.setShareMode.bind(this), 3 * 1000);
   }
   
