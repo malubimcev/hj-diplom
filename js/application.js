@@ -9,6 +9,7 @@ import {createMask} from "./drawer.js";
 
 const FILE_TYPE_ERROR_MESSAGE = 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.';
 const DROP_ERROR_MESSAGE = 'Чтобы загрузить новое изображение, пожалуйста, воспользуйтесь пунктом "Загрузить новое" в меню.';
+const MAIN_URL = 'https://netology-code.github.io/hj-26-malubimcev/';
 
 export default class Application {
   constructor(container) {
@@ -20,7 +21,7 @@ export default class Application {
     this.pageData = null;
     this.imageId = '';
     this.currentColor = 'green';
-    this.page = 'https://netology-code.github.io/hj-26-malubimcev/';
+    this.page = MAIN_URL;
     this.isUpdated = false;
 
     this.error = container.querySelector('.error');
@@ -145,8 +146,7 @@ export default class Application {
   setPageData(data) {
     this.pageData = data;
     this.imageId = this.pageData.id;
-    const id = this.imageId ? ('?id=' + this.imageId) : '';
-    this.page += id;
+    this.page = this.imageId ? (MAIN_URL + '/?id=' + this.imageId) : MAIN_URL;
   }
 
   setImageSrc(data) {
