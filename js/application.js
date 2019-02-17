@@ -139,7 +139,8 @@ export default class Application {
     this.setPageData(data);
     this.connection = null;
     this.createWebSocketConnection();
-    document.location.assign(this.page);
+    // document.location.assign(this.page);
+    history.pushState(null, null, this.page);
     setTimeout(this.setShareMode.bind(this), 3 * 1000);
   }
   
