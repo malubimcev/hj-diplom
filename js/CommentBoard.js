@@ -81,6 +81,7 @@ export class CommentBoard {
     this.form.style.zIndex = container.style.zIndex + 1;
     container.appendChild(this.form);
     this.marker = this.form.querySelector('.comments__marker');
+    this.markerInput = this.form.querySelector('.comments__marker-checkbox');
     this.addButton = this.form.querySelector('.comments__submit');
     this.closeButton = this.form.querySelector('.comments__close');
     this.commentInput = this.form.querySelector('.comments__input');
@@ -91,7 +92,7 @@ export class CommentBoard {
   }
 
   registerEvents() {
-    this.closeButton.addEventListener('click', () => this.form.classList.add('comments__hidden'), false);
+    this.closeButton.addEventListener('click', () => this.markerInput.checked = false, false);
     this.addButton.addEventListener('click', this.sendComment.bind(this), false);
   }
 
