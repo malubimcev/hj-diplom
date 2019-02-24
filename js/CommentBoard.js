@@ -139,7 +139,11 @@ export class CommentBoard {
   }
 
   hideBody() {
-    this.markerInput.checked = false;
+    if (!this.isEmpty) {
+      this.markerInput.checked = false;
+    } else {
+      this.hide();
+    }
   }
 
   showBody() {

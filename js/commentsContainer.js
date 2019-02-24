@@ -28,7 +28,7 @@ export class CommentsContainer {
     commentBoard.form.style.left = `${Math.round(coords.left)}px`;
     commentBoard.form.style.top = `${Math.round(coords.top)}px`;
     this.boards.push(commentBoard);
-    commentBoard.show();
+    // commentBoard.show();
     return commentBoard;
   }
   
@@ -46,7 +46,7 @@ export class CommentsContainer {
       commentBoard = this.addBoard({
         'left': commentObj.left,
         'top': commentObj.top
-      })
+      });
     }
 
     commentBoard.addComment(commentObj);
@@ -116,8 +116,7 @@ export class CommentsContainer {
   }
 
   removeEmptyBoards() {
-    const newBoards = this.boards.map(board => !board.isEmpty);
-    this.boards = newBoards;
+    this.boards.forEach(board => board.isEmpty ? this.removeBoard(board));
   }
 
 }//end class CommentsContainer
