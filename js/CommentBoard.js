@@ -92,7 +92,7 @@ export class CommentBoard {
   }
 
   registerEvents() {
-    this.closeButton.addEventListener('click', () => this.markerInput.checked = false, false);
+    this.closeButton.addEventListener('click', this.hideBody.bind(this), false);
     this.addButton.addEventListener('click', this.sendComment.bind(this), false);
   }
 
@@ -132,6 +132,14 @@ export class CommentBoard {
   show() {
     this.form.classList.remove('comments__hidden');
     this.marker.classList.remove('comments__hidden');    
+  }
+
+  hideBody() {
+    this.markerInput.checked = false;
+  }
+
+  showBody() {
+    this.markerInput.checked = true;
   }
 
 }//end class CommentBoard
