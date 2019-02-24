@@ -78,7 +78,7 @@ export default class Application {
 
   setCommentMode(mode) {
     this.container.appendChild(this.commentsContainer.container);
-    this.commentsContainer.show(mode);
+    this.commentsContainer.showBoards(mode);
     this.menu.setCommentState();
     this.currentMode = 'comments';
   }

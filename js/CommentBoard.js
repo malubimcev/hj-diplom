@@ -80,6 +80,7 @@ export class CommentBoard {
     this.app = app;
     this.form.style.zIndex = container.style.zIndex + 1;
     container.appendChild(this.form);
+
     this.marker = this.form.querySelector('.comments__marker');
     this.markerInput = this.form.querySelector('.comments__marker-checkbox');
     this.addButton = this.form.querySelector('.comments__submit');
@@ -87,6 +88,8 @@ export class CommentBoard {
     this.commentInput = this.form.querySelector('.comments__input');
     this.body = this.form.querySelector('.comments__body');
     this.commentLoader = this.form.querySelector('.comment div');
+
+    this.isEmpty = true;
 
     this.registerEvents();
   }
@@ -99,6 +102,7 @@ export class CommentBoard {
   addComment(commentObject) {
     const comment = createComment(commentObject);
     this.body.insertBefore(comment, this.commentLoader.parentElement);
+    this.isEmpty = false;
   }
 
   sendComment(event) {
