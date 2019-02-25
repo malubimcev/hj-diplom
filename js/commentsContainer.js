@@ -94,8 +94,7 @@ export class CommentsContainer {
         this.removeEmptyBoards();
       }
       const newBoard = this.addBoard(coords);
-      this.hideBoards();
-      newBoard.showBody();
+      this.showBoards(newBoard);
     }
   }
 
@@ -113,6 +112,7 @@ export class CommentsContainer {
   }
 
   showBoard(board) {
+    this.hideBoards();
     board.showBody();
   }
 
