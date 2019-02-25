@@ -75,11 +75,11 @@ function createComment(commentInfo) {
 }
 
 export class CommentBoard {
-  constructor(container, app) {
+  constructor(parent) {
     this.form = createCommentsForm();
-    this.app = app;
-    this.form.style.zIndex = container.style.zIndex + 1;
-    container.appendChild(this.form);
+    this.parent = parent;
+    this.form.style.zIndex = parent.container.style.zIndex + 1;
+    parent.container.appendChild(this.form);
 
     this.marker = this.form.querySelector('.comments__marker');
     this.markerInput = this.form.querySelector('.comments__marker-checkbox');
@@ -119,8 +119,8 @@ export class CommentBoard {
     }
     const requestString = props.join('&');
 
-    const fileLoader = new FileLoader(this.app);
-    const url = '/pic/' + this.app.imageId + '/comments';
+    const fileLoader = new FileLoader(this.parent.app);
+    const url = '/pic/' + this.parent.app.imageId + '/comments';
     this.commentLoader.classList.add('loader');
 
     fileLoader.sendForm(requestString, url, (data) => {

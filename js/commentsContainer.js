@@ -24,7 +24,7 @@ export class CommentsContainer {
   }
   
   addBoard(coords) {
-    const commentBoard = new CommentBoard(this.container, this.app);
+    const commentBoard = new CommentBoard(this);
     commentBoard.form.style.left = `${Math.round(coords.left)}px`;
     commentBoard.form.style.top = `${Math.round(coords.top)}px`;
     this.boards.push(commentBoard);
@@ -79,7 +79,6 @@ export class CommentsContainer {
   }
 
   removeBoard(board) {
-    // this.boards.pop();
     this.container.removeChild(board.form);
     board = null;
   }
@@ -116,7 +115,11 @@ export class CommentsContainer {
   }
 
   removeEmptyBoards() {
-    this.boards.forEach(board => board.isEmpty ? this.removeBoard(board));
+    this.boards.forEach(board => {
+      if (board.isEmpty) {
+        this.removeBoard(board);
+      }
+    });
   }
 
 }//end class CommentsContainer
