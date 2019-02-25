@@ -28,7 +28,7 @@ export class CommentsContainer {
     commentBoard.form.style.left = `${Math.round(coords.left)}px`;
     commentBoard.form.style.top = `${Math.round(coords.top)}px`;
     this.boards.push(commentBoard);
-    // commentBoard.show();
+    commentBoard.show();
     return commentBoard;
   }
   
