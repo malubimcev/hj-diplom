@@ -90,7 +90,9 @@ export class CommentsContainer {
         'top': event.pageY
       }
       this.transformCoords(coords, -1);
-      this.removeEmptyBoards();
+      if (this.boards.length > 0) {
+        this.removeEmptyBoards();
+      }
       const newBoard = this.addBoard(coords);
       this.hideBoards();
       this.showBoard(newBoard);
