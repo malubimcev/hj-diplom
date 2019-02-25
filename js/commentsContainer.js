@@ -9,7 +9,7 @@ export class CommentsContainer {
     this.container = document.createElement('div');
     this.container.classList.add('comments-container');
 
-    app.container.insertBefore(this.container, app.error);
+    this.app.container.insertBefore(this.container, app.error);
     this.container.style.width = `${app.currentImage.offsetWidth}px`;
     this.container.style.height = `${app.currentImage.offsetHeight}px`;
     this.app.setElementPositionToCenter(this.container);
@@ -73,14 +73,15 @@ export class CommentsContainer {
   }
   
   removeAll() {
-    this.boards.forEach(board => removeBoard(board));
+    this.boards.forEach(board => this.removeBoard(board));
     this.boards = [];
     this.app.container.removeChild(this.container);
   }
 
   removeBoard(board) {
     this.container.removeChild(board.form);
-    board = null;
+    //board = null;
+    this.boards.pop(); 
   }
 
   onClick(event) {
@@ -101,7 +102,7 @@ export class CommentsContainer {
 
   transformCoords(coords, sign) {
     coords.left = coords.left + sign * this.container.getBoundingClientRect().left;
-    coords.top = coords.top + sign * this.container.getBoundingClientRect().top;    
+    coords.top = coords.top + sign * this.container.getBoundingClientRect().top;
   }
 
   showBoards(mode) {
@@ -119,6 +120,7 @@ export class CommentsContainer {
   removeEmptyBoards() {
     this.boards.forEach(board => {
       if (board.isEmpty) {
+        console.log(`${this}==${board.form.style.left}`);
         this.removeBoard(board);
       }
     });
