@@ -80,7 +80,6 @@ export class CommentsContainer {
 
   removeBoard(board) {
     this.container.removeChild(board.form);
-    //board = null;
     this.boards.pop(); 
   }
 
@@ -96,7 +95,7 @@ export class CommentsContainer {
       }
       const newBoard = this.addBoard(coords);
       this.hideBoards();
-      this.showBoard(newBoard);
+      newBoard.showBody();
     }
   }
 
@@ -120,7 +119,6 @@ export class CommentsContainer {
   removeEmptyBoards() {
     this.boards.forEach(board => {
       if (board.isEmpty) {
-        console.log(`${this}==${board.form.style.left}`);
         this.removeBoard(board);
       }
     });
