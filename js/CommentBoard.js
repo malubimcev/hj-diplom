@@ -97,7 +97,7 @@ export class CommentBoard {
   registerEvents() {
     this.closeButton.addEventListener('click', this.hideBody.bind(this), false);
     this.addButton.addEventListener('click', this.sendComment.bind(this), false);
-    this.markerInput.addEventListener('change', this.hideBody.bind(this), false);
+    this.markerInput.addEventListener('change', () => this.parent.showBoard(this), false);
   }
 
   addComment(commentObject) {
