@@ -507,6 +507,10 @@ body {
 .comments__hidden{
   display: none;
 }
+
+.comments__visible{
+  display: block;
+}
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~ поделиться ~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 .menu__url {

@@ -59,6 +59,7 @@ export class CommentsContainer {
       commentObjects.push(commentsList[key]);
     }
     const commentCoords = commentObjects.map(obj => `${obj.left}:${obj.top}`);
+    
     const formCoords = [...new Set(commentCoords)];
     formCoords
       .map(coord => [...coord.split(':')])

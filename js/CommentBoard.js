@@ -130,13 +130,17 @@ export class CommentBoard {
   }
 
   hide() {
+    this.form.classList.remove('comments__visible');
+    this.marker.classList.remove('comments__visible');   
     this.form.classList.add('comments__hidden');
     this.marker.classList.add('comments__hidden');  
   }
 
   show() {
     this.form.classList.remove('comments__hidden');
-    this.marker.classList.remove('comments__hidden');    
+    this.marker.classList.remove('comments__hidden');
+    this.form.classList.add('comments__visible');
+    this.marker.classList.add('comments__visible');  
   }
 
   hideBody() {
