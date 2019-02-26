@@ -97,8 +97,8 @@ export class CommentBoard {
   registerEvents() {
     this.closeButton.addEventListener('click', this.hideBody.bind(this), false);
     this.addButton.addEventListener('click', this.sendComment.bind(this), false);
-    this.markerInput.addEventListener('change', () => this.parent.showBoard(this), false);
-    this.markerInput.addEventListener('click', (e) => console.log(e.target.checked), false);
+    this.markerInput.addEventListener('change', (e) => console.log(`${e.target.className}, ${e.target.checked}`), false);
+    this.markerInput.addEventListener('click', (e) => console.log(`${e.target.checked}`), false);
   }
 
   addComment(commentObject) {
