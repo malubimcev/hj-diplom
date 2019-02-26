@@ -3,12 +3,13 @@
 import Menu from "./menu.js";
 import FileLoader from "./loader.js";
 import WSConnection from "./socket.js";
-import {CommentsContainer} from "./comments.js";
+import {CommentsContainer} from "./commentsContainer.js";
 import {Drawer} from "./drawer.js";
 import {createMask} from "./drawer.js";
 
 const FILE_TYPE_ERROR_MESSAGE = 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.';
 const DROP_ERROR_MESSAGE = 'Чтобы загрузить новое изображение, пожалуйста, воспользуйтесь пунктом "Загрузить новое" в меню.';
+const MAIN_URL = 'https://netology-code.github.io/hj-26-malubimcev/';
 
 export default class Application {
   constructor(container) {
@@ -20,7 +21,7 @@ export default class Application {
     this.pageData = null;
     this.imageId = '';
     this.currentColor = 'green';
-    this.page = 'https://netology-code.github.io/hj-26-malubimcev/';
+    this.page = MAIN_URL;
     this.isUpdated = false;
 
     this.error = container.querySelector('.error');
@@ -70,15 +71,14 @@ export default class Application {
   }
 
   setShareMode() {
-    const id = this.imageId ? ('?id=' + this.imageId) : '';
-    this.menu.linkField.value = this.page + id;
+    this.menu.linkField.value = this.page;
     this.menu.setShareState();
     this.currentMode = 'share';
   }
 
   setCommentMode(mode) {
     this.container.appendChild(this.commentsContainer.container);
-    this.commentsContainer.show(mode);
+    this.commentsContainer.showBoards(mode);
     this.menu.setCommentState();
     this.currentMode = 'comments';
   }
@@ -139,12 +139,14 @@ export default class Application {
     this.setPageData(data);
     this.connection = null;
     this.createWebSocketConnection();
+    history.pushState(null, null, this.page);
     setTimeout(this.setShareMode.bind(this), 2 * 1000);
   }
   
   setPageData(data) {
     this.pageData = data;
-    this.imageId = this.pageData.id;   
+    this.imageId = this.pageData.id;
+    this.page = this.imageId ? (MAIN_URL + '/?id=' + this.imageId) : MAIN_URL;
   }
 
   setImageSrc(data) {
