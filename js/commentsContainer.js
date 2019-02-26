@@ -114,7 +114,7 @@ export class CommentsContainer {
 
   showBoard(board) {
     this.hideBoards();
-    board.showBody();
+    board.show();
   }
 
   removeEmptyBoards() {
