@@ -99,9 +99,8 @@ export class CommentBoard {
     this.addButton.addEventListener('click', this.sendComment.bind(this), false);
     this.form.addEventListener('click', (e) => {
       if (e.target.className === 'comments__marker-checkbox') {
-        console.log(this);
         this.parent.hideBoards();
-        this.show();
+        this.showBody();
       }
     }, false);
   }
