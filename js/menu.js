@@ -101,6 +101,7 @@ export default class Menu {
     this.resetState();
     this.setEditState();
     this.menu.querySelector('.mode.comments').dataset.state = 'selected';
+    this.changeCommentMode();
   }
 
   setState(event) {

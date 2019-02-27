@@ -137,7 +137,6 @@ export class CommentBoard {
   hide() {
     this.form.classList.remove('comments__visible');
     this.marker.classList.remove('comments__visible');
-    //this.body.classList.remove('comments__visible');
     this.form.classList.add('comments__hidden');
     this.marker.classList.add('comments__hidden');  
   }
@@ -154,6 +153,7 @@ export class CommentBoard {
       this.markerInput.checked = false;
     } else {
       this.hide();
+      this.parent.removeEmptyBoards();
     }
   }
 
