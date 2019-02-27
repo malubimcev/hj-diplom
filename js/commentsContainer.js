@@ -96,6 +96,7 @@ export class CommentsContainer {
       }
       const newBoard = this.addBoard(coords);
       this.showBoard(newBoard);
+      newBoard.showBody();
     }
   }
 
