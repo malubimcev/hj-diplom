@@ -9,6 +9,7 @@ import {createMask} from "./drawer.js";
 
 const FILE_TYPE_ERROR_MESSAGE = 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.';
 const DROP_ERROR_MESSAGE = 'Чтобы загрузить новое изображение, пожалуйста, воспользуйтесь пунктом "Загрузить новое" в меню.';
+const ERROR_MESSAGE_SHOW_DELAY = 10;
 const MAIN_URL = 'https://netology-code.github.io/hj-26-malubimcev/';
 
 export default class Application {
@@ -128,7 +129,7 @@ export default class Application {
       }
     } else {
       this.setErrorMode(DROP_ERROR_MESSAGE);
-      setTimeout(() => this.hideError(mode), 10 * 1000);
+      setTimeout(() => this.hideError(mode), ERROR_MESSAGE_SHOW_DELAY * 1000);
     }
   }
   
