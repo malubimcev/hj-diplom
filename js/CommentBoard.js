@@ -120,7 +120,7 @@ export class CommentBoard {
     const commentInfoObj = {
     	'left': parseInt(this.form.style.left),
     	'top': parseInt(this.form.style.top),
-    	'message': this.commentInput.value
+    	'message': message
     }
     this.commentInput.value = '';
     let props = [];
