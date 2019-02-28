@@ -155,7 +155,7 @@ export class CommentBoard {
   hideBody() {
     if (this.isEmpty) {
       this.hide();
-      this.parent.removeBoard();
+      this.parent.removeBoard(this);
     } else {
       this.markerInput.checked = false;
 
