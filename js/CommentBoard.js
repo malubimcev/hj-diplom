@@ -153,11 +153,12 @@ export class CommentBoard {
   }
 
   hideBody() {
-    if (!this.isEmpty) {
-      this.markerInput.checked = false;
-    } else {
+    if (this.isEmpty) {
       this.hide();
-      //this.parent.removeEmptyBoards();
+      this.parent.removeBoard();
+    } else {
+      this.markerInput.checked = false;
+
     }
   }
 

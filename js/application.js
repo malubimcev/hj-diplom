@@ -95,6 +95,12 @@ export default class Application {
     this.errorMessage.textContent = errMessage;
   }
 
+  hideError(mode) {
+    this.currentMode = mode;
+    this.error.style = 'display: none;';
+    this.errorMessage.textContent = '';
+  }
+
   setColor(colorName) {
     this.currentColor = colorName;
     if (this.drawer) {
@@ -112,6 +118,7 @@ export default class Application {
 
   onDrop(event) {
     const file = event.dataTransfer.files[0];
+    const mode = this.currentMode;
     const fileType = /^image\//;
     if (this.currentMode === 'publication' && !this.isUpdated) {
       if (file && file.type.match(fileType)) {
@@ -121,6 +128,7 @@ export default class Application {
       }
     } else {
       this.setErrorMode(DROP_ERROR_MESSAGE);
+      setTimeout(() => this.hideError(mode), 10 * 1000);
     }
   }
   
