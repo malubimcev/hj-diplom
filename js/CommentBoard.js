@@ -112,6 +112,10 @@ export class CommentBoard {
   }
 
   sendComment(event) {
+    const message = this.commentInput.value.trim();
+    if (!message) {
+      return;
+    }
   	event.preventDefault();
     const commentInfoObj = {
     	'left': parseInt(this.form.style.left),

@@ -146,7 +146,7 @@ export default class Application {
   setPageData(data) {
     this.pageData = data;
     this.imageId = this.pageData.id;
-    this.page = this.imageId ? (MAIN_URL + '/?id=' + this.imageId) : MAIN_URL;
+    this.page = this.imageId ? (MAIN_URL + '?id=' + this.imageId) : MAIN_URL;
   }
 
   setImageSrc(data) {
