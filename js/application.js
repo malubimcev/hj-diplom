@@ -9,7 +9,10 @@ import {createMask} from "./drawer.js";
 
 const FILE_TYPE_ERROR_MESSAGE = 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.';
 const DROP_ERROR_MESSAGE = 'Чтобы загрузить новое изображение, пожалуйста, воспользуйтесь пунктом "Загрузить новое" в меню.';
+<<<<<<< HEAD
 const ERROR_MESSAGE_SHOW_DELAY = 10;
+=======
+>>>>>>> 66767c2621d290efff77545c088fe53db1ecb5b0
 const MAIN_URL = 'https://netology-code.github.io/hj-26-malubimcev/';
 
 export default class Application {
@@ -87,6 +90,7 @@ export default class Application {
   setDrawMode() {
     this.container.appendChild(this.drawer.canvas);
     this.currentMode = 'draw';
+<<<<<<< HEAD
   }
 
   setErrorMode(errMessage) {
@@ -102,6 +106,17 @@ export default class Application {
     this.errorMessage.textContent = '';
   }
 
+=======
+  }
+
+  setErrorMode(errMessage) {
+    this.currentMode = 'error';
+    this.imageLoader.style = 'display: none;';
+    this.error.style = 'display: block;';
+    this.errorMessage.textContent = errMessage;
+  }
+
+>>>>>>> 66767c2621d290efff77545c088fe53db1ecb5b0
   setColor(colorName) {
     this.currentColor = colorName;
     if (this.drawer) {
@@ -155,7 +170,11 @@ export default class Application {
   setPageData(data) {
     this.pageData = data;
     this.imageId = this.pageData.id;
+<<<<<<< HEAD
     this.page = this.imageId ? (MAIN_URL + '?id=' + this.imageId) : MAIN_URL;
+=======
+    this.page = this.imageId ? (MAIN_URL + '/?id=' + this.imageId) : MAIN_URL;
+>>>>>>> 66767c2621d290efff77545c088fe53db1ecb5b0
   }
 
   setImageSrc(data) {
