@@ -1,3 +1,8 @@
+/*
+  Модуль application.js.
+  Экспортирует класс Application.
+  Обеспечивает основной функционал приложения.
+*/
 'use strict';
 
 import Menu from "./menu.js";
@@ -7,35 +12,46 @@ import {CommentsContainer} from "./commentsContainer.js";
 import {Drawer} from "./drawer.js";
 import {createMask} from "./drawer.js";
 
-const FILE_TYPE_ERROR_MESSAGE = 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.';
-const DROP_ERROR_MESSAGE = 'Чтобы загрузить новое изображение, пожалуйста, воспользуйтесь пунктом "Загрузить новое" в меню.';
-<<<<<<< HEAD
-const ERROR_MESSAGE_SHOW_DELAY = 10;
-=======
->>>>>>> 66767c2621d290efff77545c088fe53db1ecb5b0
-const MAIN_URL = 'https://netology-code.github.io/hj-26-malubimcev/';
+const
+  //Сообщение при попытке загрузить файл недопустимого формата:
+  FILE_TYPE_ERROR_MESSAGE = 'Неверный формат файла. Пожалуйста, выберите изображение в формате .jpg или .png.',
+  //Сообщение при попытке перетащить новый файл на имеющееся изображение:
+  DROP_ERROR_MESSAGE = 'Чтобы загрузить новое изображение, пожалуйста, воспользуйтесь пунктом "Загрузить новое" в меню.',
+  //Задержка вывода сообщения об ошибке:
+  ERROR_MESSAGE_SHOW_DELAY = 10,
+  //URL-адрес сервера приложения:
+  MAIN_URL = 'https://netology-code.github.io/hj-26-malubimcev/';
 
+//Класс Application: основной функционал приложения
 export default class Application {
+  
   constructor(container) {
+    //Контейнер, в котором работает приложение:
     this.container = container;
 
+    //графический элемент, отображающий процесс загрузки файла:
     this.imageLoader = container.querySelector('.image-loader');
+
+    //текущее изображение:
     this.currentImage = container.querySelector('.current-image');
 
-    this.pageData = null;
-    this.imageId = '';
-    this.currentColor = 'green';
-    this.page = MAIN_URL;
-    this.isUpdated = false;
+    this.pageData = null;//хранит данные состояния страницы
+    this.imageId = '';//хранит идентификатор текущего изображения
+    this.currentColor = 'green';//цвет рисования по-умолчанию
+    this.page = MAIN_URL;//хранит адрес текущей страницы
+    this.isUpdated = false;//признак обновленной страницы
 
+    //графический элемент, отображающий сообщение об ошибке:
     this.error = container.querySelector('.error');
     this.errorMessage = container.querySelector('.error__message');
 
+    //ссылка на объект меню:
     this.menu = new Menu(container.querySelector('.menu'), this);
+    //ссылка на объект рисования:
     this.drawer = null;
-    this.currentMode = '';
-    this.connection = null;
-    this.commentsContainer = null;
+    this.currentMode = '';//хранит имя текущего режима (состояние приложения)
+    this.connection = null;//ссылка на объект веб-сокет-соединения
+    this.commentsContainer = null;//ссылка на объект - контейнер комментариев 
 
     this.registerEvents();
   }
@@ -43,6 +59,7 @@ export default class Application {
   registerEvents() {
     document.addEventListener('DOMContentLoaded', this.onPageLoad.bind(this), false);
 
+    //Предотвращается открытие файла в браузере при перетаскивании:
     ['dragenter', 'dragover', 'drop'].forEach(eventName => {
       this.container.addEventListener(eventName, event => event.preventDefault(), false);
     });
@@ -51,6 +68,7 @@ export default class Application {
     this.currentImage.addEventListener('load', this.onImageLoad.bind(this), false);
   }
 
+  //Обработчик события загрузки страницы (событие DOMContentLoaded)
   onPageLoad() {
     this.imageId = window.location.search.slice(4);
     if (this.imageId) {
@@ -60,12 +78,15 @@ export default class Application {
     }
   }
 
+  //Метод createWebSocketConnection создает новое веб-сокет-соединение
   createWebSocketConnection() {
     if (!this.connection) {
       this.connection = new WSConnection(this);
     }
   }
 
+  //Метод setPublicationMode устанавливает приложение в режим "Публикация"
+  //Вызывается из обработчика onPageLoad текущего модуля после загрузки страницы
   setPublicationMode() {
     this.currentImage.src = '';
     this.drawer = null;
@@ -74,12 +95,18 @@ export default class Application {
     this.currentMode = 'publication';
   }
 
+  //Метод setShareMode устанавливает приложение в режим "Поделиться"
+  //Вызывается при клике на пункте меню "Поделиться" из модуля menu.js
+  // или из обработчика onFileUploaded текущего модуля
   setShareMode() {
     this.menu.linkField.value = this.page;
     this.menu.setShareState();
     this.currentMode = 'share';
   }
 
+  //Метод setCommentMode устанавливает приложение в режим "Комментарии"
+  //Вызывается при клике на пункте меню "Комментарии" из модуля menu.js
+  // или из обработчика onDrop текущего модуля
   setCommentMode(mode) {
     this.container.appendChild(this.commentsContainer.container);
     this.commentsContainer.showBoards(mode);
@@ -87,12 +114,15 @@ export default class Application {
     this.currentMode = 'comments';
   }
 
+  //Метод setDrawMode устанавливает приложение в режим "Рисование"
+  //Вызывается при клике на пункте меню "Рисование" из модуля menu.js
   setDrawMode() {
     this.container.appendChild(this.drawer.canvas);
     this.currentMode = 'draw';
-<<<<<<< HEAD
   }
 
+  //Метод setErrorMode устанавливает приложение в режим ошибки
+  //Вызывается из обработчика onDrop текущего модуля
   setErrorMode(errMessage) {
     this.currentMode = 'error';
     this.imageLoader.style = 'display: none;';
@@ -100,23 +130,16 @@ export default class Application {
     this.errorMessage.textContent = errMessage;
   }
 
+  //Метод hideError скрывает сообщение об ошибке
+  //Вызывается из обработчика onDrop текущего модуля
   hideError(mode) {
     this.currentMode = mode;
     this.error.style = 'display: none;';
     this.errorMessage.textContent = '';
   }
 
-=======
-  }
-
-  setErrorMode(errMessage) {
-    this.currentMode = 'error';
-    this.imageLoader.style = 'display: none;';
-    this.error.style = 'display: block;';
-    this.errorMessage.textContent = errMessage;
-  }
-
->>>>>>> 66767c2621d290efff77545c088fe53db1ecb5b0
+  //Метод setColor устанавливает текущий цвет рисования
+  //Вызывается при клике на значке цвета в палитре меню из модуля menu.js
   setColor(colorName) {
     this.currentColor = colorName;
     if (this.drawer) {
@@ -124,6 +147,8 @@ export default class Application {
     }
   }
 
+  //Метод selectFile вызывает диалоговое окно выбора файла
+  //Вызывается при клике на пункте меню "Загрузить новое" из модуля menu.js
   selectFile() {
     const fileInput = document.createElement('input');
     fileInput.setAttribute('type', 'file');
@@ -132,26 +157,34 @@ export default class Application {
     fileInput.click();
   }
 
+  //Обработчик события перетаскивания файла изображения на страницу
   onDrop(event) {
     const file = event.dataTransfer.files[0];
     const mode = this.currentMode;
     const fileType = /^image\//;
+    //действия по загрузк файла разрешены в режиме "Публикация":
     if (this.currentMode === 'publication' && !this.isUpdated) {
+      //проверка наличия файла соответствующего формата:
       if (file && file.type.match(fileType)) {
         this.uploadFile(file);
       } else {
+        //при выборе файла недопустимого формата:
         this.setErrorMode(FILE_TYPE_ERROR_MESSAGE);
       }
     } else {
+      //при попытке перетащить файл на страницу не в режиме "Публикация":
       this.setErrorMode(DROP_ERROR_MESSAGE);
+      //скрывается сообщение об ошибке через заданное время:
       setTimeout(() => this.hideError(mode), ERROR_MESSAGE_SHOW_DELAY * 1000);
     }
   }
   
+  //Метод uploadFile загружает файл изображения на сервер
+  //вызывается при выборе или перетаскивании нового файла изображения
   uploadFile(file) {
-    this.isUpdated = false;
-    this.imageLoader.style = 'display: block;';
-    this.error.style = 'display: none;';
+    this.isUpdated = false;//сбрасывает признак обновления страницы
+    this.imageLoader.style = 'display: block;';//отображает загрузчик
+    this.error.style = 'display: none;';//прячет сообщение об ошибке
     const formData = new FormData();
     formData.append('title', file.name);
     formData.append('image', file, file.name);
@@ -159,29 +192,32 @@ export default class Application {
     loader.upload(formData, '/pic', this.onFileUploaded.bind(this));
   }
 
+  //Обработчик события загрузки файла на сервер
+  //вызывается из метода uploadFile текущего модуля
   onFileUploaded(data) {
     this.setPageData(data);
     this.connection = null;
     this.createWebSocketConnection();
-    history.pushState(null, null, this.page);
-    setTimeout(this.setShareMode.bind(this), 2 * 1000);
+    history.pushState(null, null, this.page);//меняет адрес текущей страницы
+    setTimeout(this.setShareMode.bind(this), 2 * 1000);//включает режим "Поделиться" после обновления страницы
   }
   
+  //Метод setPageData сохраняет данные об изображении
+  //вызывается из метода setImageSrc и обработчика onFileUploaded текущего модуля
   setPageData(data) {
     this.pageData = data;
     this.imageId = this.pageData.id;
-<<<<<<< HEAD
     this.page = this.imageId ? (MAIN_URL + '?id=' + this.imageId) : MAIN_URL;
-=======
-    this.page = this.imageId ? (MAIN_URL + '/?id=' + this.imageId) : MAIN_URL;
->>>>>>> 66767c2621d290efff77545c088fe53db1ecb5b0
   }
 
+  //Метод setImageSrc очищает страницу при загрузке нового изображения
+  //вызывается из метода loadImageData текущего модуля
   setImageSrc(data) {
     this.setPageData(data);
     this.currentImage.src = data.url;//будет выполнен обработчик onImageLoad()
   }
 
+  //Обработчик события загрузки изображения в элемент img
   onImageLoad(event) {
     this.imageLoader.style = 'display: none;';
     this.clearPage();
@@ -202,6 +238,8 @@ export default class Application {
     this.updatePage();
   }
 
+  //Метод clearPage очищает страницу при загрузке нового изображения
+  //вызывается из обработчика onImageLoad текущего модуля
   clearPage() {
     if (this.drawer) {
       const masks = this.container.querySelectorAll('.mask');
@@ -216,6 +254,8 @@ export default class Application {
     }
   }
 
+  //Метод uploadMask загружает маску на сервер
+  //вызывается из модуля drawer.js
   uploadMask(img) {
     return new Promise((resolve, reject) => {
       this.connection.send(img);
@@ -223,8 +263,9 @@ export default class Application {
     });
   }
 
+  //Метод addMask добавляет новую маску на изображение
+  //вызывается из модуля socket.js при событии "mask"
   addMask(url) {
-    //вызывается из Socket при событии "mask"
     createMask(this.currentImage)
       .then((mask) => {
         mask.addEventListener('load', () => {
@@ -235,13 +276,15 @@ export default class Application {
       });
   }
 
+  //Метод addComment добавляет новый комментарий в контейнер комментариев
+  //Вызывается из модуля socket.js при событии "comment"
   addComment(commentObj) {
-    //вызывается из Socket при событии "comment"
     this.commentsContainer.addComment(commentObj);
   }
 
+  //Метод loadImageData загружает данные о текущем изображении
+  //вызывается из модуля socket.js при событии "pic"
   loadImageData() {
-    //вызывается из Socket при событии "pic"
     if (!this.isUpdated) {
       const loader = new FileLoader(this);
       loader.loadData('/pic/' + this.imageId)
@@ -252,6 +295,8 @@ export default class Application {
     }
   }
 
+  //Метод updatePage обновляет страницу при получении данных об изображении
+  //вызывается из обработчика onImageLoad в текущем модуле
   updatePage() {
     if (this.pageData.mask) {
       this.addMask(this.pageData.mask);
@@ -261,6 +306,8 @@ export default class Application {
     }
   }
   
+  //Метод setElementPositionToCenter позиционирует элемент в центре страницы
+  //вызывается из модулей при создании элементов DOM
   setElementPositionToCenter(elem) {
     elem.style.left = '50%';
     elem.style.top = '50%';

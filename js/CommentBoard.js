@@ -1,7 +1,13 @@
+/*
+  Модуль CommentBoard.js.
+  Экспортирует класс CommentBoard.
+  Обеспечивает функционал формы ввода данных.
+*/
 'use strict';
 
 import FileLoader from "./loader.js";
 
+//Внутренняя функция-сборщик для создания формы:
 function createCommentsForm() {
   const form = document.createElement('form');
   form.classList.add('comments__form');
@@ -53,6 +59,7 @@ function createCommentsForm() {
   return form;
 }
 
+//Внутренняя функция-сборщик для создания комментария:
 function createComment(commentInfo) {
   const timestamp = document.createElement('p');
   timestamp.classList.add('comment__time');
@@ -74,13 +81,18 @@ function createComment(commentInfo) {
   return comment;
 }
 
+//Класс CommentBoard
+//Представляет объект, хранящий форму ввода комментариев
+// и обеспечивающий ее функционал.
 export class CommentBoard {
+
   constructor(parent) {
     this.form = createCommentsForm();
-    this.parent = parent;
+    this.parent = parent;//ссылка на родительский объект (commentsContainer)
     this.form.style.zIndex = parent.container.style.zIndex + 1;
     parent.container.appendChild(this.form);
 
+    //элементы формы:
     this.marker = this.form.querySelector('.comments__marker');
     this.markerInput = this.form.querySelector('.comments__marker-checkbox');
     this.addButton = this.form.querySelector('.comments__submit');
@@ -89,7 +101,7 @@ export class CommentBoard {
     this.body = this.form.querySelector('.comments__body');
     this.commentLoader = this.form.querySelector('.comment div');
 
-    this.isEmpty = true;
+    this.isEmpty = true;//признак отсутствия комментариев в форме
 
     this.registerEvents();
   }
@@ -105,39 +117,48 @@ export class CommentBoard {
     }, false);
   }
 
+  //Метод addComment добавляет комментарий в форму
   addComment(commentObject) {
     const comment = createComment(commentObject);
     this.body.insertBefore(comment, this.commentLoader.parentElement);
     this.isEmpty = false;
   }
 
+  //Метод sendComment отправляет комментарий на сервер
+  //Вызывается при клике на кнопке "Отправить" в форме
   sendComment(event) {
     const message = this.commentInput.value.trim();
     if (!message) {
       return;
     }
-  	event.preventDefault();
+    event.preventDefault();
+    //создание объекта с информацией о комментарии: координаты текущей формы и содержимое комментария
     const commentInfoObj = {
     	'left': parseInt(this.form.style.left),
     	'top': parseInt(this.form.style.top),
     	'message': message
     }
-    this.commentInput.value = '';
-    let props = [];
+    this.commentInput.value = '';//очистка поля ввода комментария
+    let props = [];//массив для данных комментария в формате "ключ-значение"
     for (const key in commentInfoObj) {
     	props.push(key + '=' + commentInfoObj[key]);
     }
+
+    //строка для отправки в формате 'application/x-www-form-urlencoded':
     const requestString = props.join('&');
 
+    //для отправки используется объект FileLoader
     const fileLoader = new FileLoader(this.parent.app);
     const url = '/pic/' + this.parent.app.imageId + '/comments';
     this.commentLoader.classList.add('loader');
 
+    //отправка, после чего скрывается лоадер
     fileLoader.sendForm(requestString, url, (data) => {
     	this.commentLoader.classList.remove('loader');
     });
   }
 
+  //Метод hide скрывает текущую форму вместе с маркером
   hide() {
     this.form.classList.remove('comments__visible');
     this.marker.classList.remove('comments__visible');
@@ -145,6 +166,7 @@ export class CommentBoard {
     this.marker.classList.add('comments__hidden');  
   }
 
+  //Метод show показывает текущую форму и маркер
   show() {
     this.form.classList.remove('comments__hidden');
     this.marker.classList.remove('comments__hidden');
@@ -152,6 +174,8 @@ export class CommentBoard {
     this.marker.classList.add('comments__visible');  
   }
 
+  //Метод hideBody скрывает только форму, оставляя или показывая маркер
+  // в зависимости от режима переключателя "Скрыть/Показать"
   hideBody() {
     if (this.isEmpty) {
       this.hide();
@@ -160,6 +184,8 @@ export class CommentBoard {
     }
   }
 
+  //Метод showBody показывает текущую форму,
+  // в зависимости от режима переключателя "Скрыть/Показать"
   showBody() {
     this.markerInput.checked = true;
   }
